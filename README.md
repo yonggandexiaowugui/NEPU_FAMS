@@ -1,0 +1,2 @@
+# NEPU_FAMS
+东北石油大学2026小学期SpringBoot后端项目，设备资产管理系统FAMS
