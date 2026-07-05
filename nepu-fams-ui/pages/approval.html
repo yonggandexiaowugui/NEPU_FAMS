@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEPU-FAMS 领用审批详情</title>
+    <style id="theme-vars">
+/* NEPU-FAMS Design System - Cyberpunk Sci-Fi Admin Console */
+/* Brand CSS Variables */
+
+:root {
+  /* === Core Background System === */
+  --color-bg-primary: #080C16;
+  --color-bg-secondary: #0D1321;
+  --color-bg-tertiary: #111827;
+  --color-bg-card: rgba(13, 19, 33, 0.7);
+  --color-bg-card-hover: rgba(17, 24, 39, 0.85);
+  --color-bg-glass: rgba(13, 19, 33, 0.6);
+  --color-bg-overlay: rgba(8, 12, 22, 0.85);
+  --color-bg-input: rgba(13, 19, 33, 0.8);
+
+  /* === Primary Brand - Electric Petroleum Blue === */
+  --color-primary: #00E5FF;
+  --color-primary-rgb: 0, 229, 255;
+  --color-primary-dim: rgba(0, 229, 255, 0.6);
+  --color-primary-faint: rgba(0, 229, 255, 0.15);
+  --color-primary-glow: rgba(0, 229, 255, 0.4);
+  --color-primary-dark: #00B8CC;
+  --color-primary-light: #33EBFF;
+
+  /* === Secondary Brand - Neon Industrial Gold === */
+  --color-secondary: #FFB800;
+  --color-secondary-rgb: 255, 184, 0;
+  --color-secondary-dim: rgba(255, 184, 0, 0.6);
+  --color-secondary-faint: rgba(255, 184, 0, 0.15);
+  --color-secondary-glow: rgba(255, 184, 0, 0.4);
+
+  /* === Functional Colors === */
+  --color-success: #00FF94;
+  --color-success-rgb: 0, 255, 148;
+  --color-success-dim: rgba(0, 255, 148, 0.6);
+  --color-success-faint: rgba(0, 255, 148, 0.15);
+  --color-success-glow: rgba(0, 255, 148, 0.4);
+
+  --color-warning: #FF8A00;
+  --color-warning-rgb: 255, 138, 0;
+  --color-warning-dim: rgba(255, 138, 0, 0.6);
+  --color-warning-faint: rgba(255, 138, 0, 0.15);
+  --color-warning-glow: rgba(255, 138, 0, 0.4);
+
+  --color-danger: #FF2E63;
+  --color-danger-rgb: 255, 46, 99;
+  --color-danger-dim: rgba(255, 46, 99, 0.6);
+  --color-danger-faint: rgba(255, 46, 99, 0.15);
+  --color-danger-glow: rgba(255, 46, 99, 0.4);
+
+  --color-info: #00E5FF;
+
+  /* === Text Colors === */
+  --color-text-primary: #E8ECF4;
+  --color-text-secondary: rgba(232, 236, 244, 0.7);
+  --color-text-tertiary: rgba(232, 236, 244, 0.45);
+  --color-text-disabled: rgba(232, 236, 244, 0.25);
+  --color-text-inverse: #080C16;
+  --color-text-link: #00E5FF;
+  --color-text-glow: rgba(232, 236, 244, 0.9);
+
+  /* === Border Colors === */
+  --color-border-primary: rgba(0, 229, 255, 0.2);
+  --color-border-hover: rgba(0, 229, 255, 0.4);
+  --color-border-focus: rgba(0, 229, 255, 0.6);
+  --color-border-subtle: rgba(232, 236, 244, 0.08);
+  --color-border-glass: rgba(0, 229, 255, 0.12);
+
+  /* === Glow / Neon Effects === */
+  --glow-primary: 0 0 10px rgba(0, 229, 255, 0.5), 0 0 20px rgba(0, 229, 255, 0.2);
+  --glow-secondary: 0 0 10px rgba(255, 184, 0, 0.5), 0 0 20px rgba(255, 184, 0, 0.2);
+  --glow-success: 0 0 10px rgba(0, 255, 148, 0.5), 0 0 20px rgba(0, 255, 148, 0.2);
+  --glow-danger: 0 0 10px rgba(255, 46, 99, 0.5), 0 0 20px rgba(255, 46, 99, 0.2);
+  --glow-warning: 0 0 10px rgba(255, 138, 0, 0.5), 0 0 20px rgba(255, 138, 0, 0.2);
+
+  /* === Glass Effect === */
+  --glass-blur: blur(16px);
+  --glass-blur-heavy: blur(24px);
+  --glass-bg: rgba(13, 19, 33, 0.65);
+  --glass-border: 1px solid rgba(0, 229, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(0, 229, 255, 0.06);
+
+  /* === Radius System === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Spacing === */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* === Typography === */
+  --font-family-display: 'Orbitron', 'Rajdhani', 'Microsoft YaHei', sans-serif;
+  --font-family-body: 'Inter', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 40px;
+  --font-size-5xl: 48px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.05em;
+  --letter-spacing-wider: 0.1em;
+
+  /* === Shadow System === */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(0, 229, 255, 0.06);
+  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 229, 255, 0.1);
+
+  /* === Sidebar === */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --sidebar-bg: rgba(8, 12, 22, 0.95);
+
+  /* === Header === */
+  --header-height: 56px;
+  --header-bg: rgba(8, 12, 22, 0.8);
+
+  /* === Transitions === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+  --transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === Z-Index Scale === */
+  --z-sidebar: 100;
+  --z-header: 200;
+  --z-dropdown: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+}
+
+/* === Global Base Styles === */
+html {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family-body);
+  background: var(--color-bg-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* === Utility Classes === */
+.text-glow {
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6), 0 0 16px rgba(0, 229, 255, 0.3);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 8px rgba(255, 184, 0, 0.6), 0 0 16px rgba(255, 184, 0, 0.3);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.glass-card-hover:hover {
+  background: var(--color-bg-card-hover);
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-card), var(--glow-primary);
+  transform: translateY(-2px) scale(1.02);
+  transition: all var(--transition-normal);
+}
+
+.neon-border {
+  border: 1px solid var(--color-border-primary);
+  box-shadow: var(--glow-primary);
+}
+
+.neon-border-gold {
+  border: 1px solid rgba(255, 184, 0, 0.3);
+  box-shadow: var(--glow-secondary);
+}
+
+.neon-text {
+  color: var(--color-primary);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.neon-btn {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(0, 229, 255, 0.1));
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 8px 20px;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--glow-primary);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.neon-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.3), rgba(0, 229, 255, 0.2));
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.6), 0 0 30px rgba(0, 229, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.neon-btn-gold {
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.2), rgba(255, 184, 0, 0.1));
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  box-shadow: var(--glow-secondary);
+  text-shadow: 0 0 8px rgba(255, 184, 0, 0.5);
+}
+
+.neon-btn-gold:hover {
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.3), rgba(255, 184, 0, 0.2));
+  box-shadow: 0 0 15px rgba(255, 184, 0, 0.6), 0 0 30px rgba(255, 184, 0, 0.3);
+}
+
+.neon-btn-danger {
+  background: linear-gradient(135deg, rgba(255, 46, 99, 0.2), rgba(255, 46, 99, 0.1));
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  box-shadow: var(--glow-danger);
+}
+
+/* === Neon Status Badges === */
+.status-idle {
+  background: var(--color-success-faint);
+  border: 1px solid rgba(0, 255, 148, 0.3);
+  color: var(--color-success);
+  text-shadow: 0 0 6px rgba(0, 255, 148, 0.4);
+}
+
+.status-in-use {
+  background: var(--color-warning-faint);
+  border: 1px solid rgba(255, 138, 0, 0.3);
+  color: var(--color-warning);
+  text-shadow: 0 0 6px rgba(255, 138, 0, 0.4);
+}
+
+.status-repair {
+  background: rgba(255, 184, 0, 0.15);
+  border: 1px solid rgba(255, 184, 0, 0.3);
+  color: var(--color-secondary);
+  text-shadow: 0 0 6px rgba(255, 184, 0, 0.4);
+}
+
+.status-scrapped {
+  background: var(--color-danger-faint);
+  border: 1px solid rgba(255, 46, 99, 0.3);
+  color: var(--color-danger);
+  text-shadow: 0 0 6px rgba(255, 46, 99, 0.4);
+}
+
+.status-loss {
+  background: rgba(232, 236, 244, 0.08);
+  border: 1px solid rgba(232, 236, 244, 0.15);
+  color: var(--color-text-tertiary);
+}
+
+/* === Table Styles === */
+.cyber-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.cyber-table thead th {
+  background: rgba(0, 229, 255, 0.08);
+  border-bottom: 1px solid var(--color-border-primary);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.cyber-table tbody tr {
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: all var(--transition-fast);
+}
+
+.cyber-table tbody tr:hover {
+  background: rgba(0, 229, 255, 0.05);
+  box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.03);
+}
+
+.cyber-table tbody td {
+  padding: 12px 16px;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.4);
+}
+
+/* === Animations === */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.8), 0 0 40px rgba(0, 229, 255, 0.3); }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scan-line {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+@keyframes liquid-wave {
+  0% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; }
+  50% { border-radius: 60% 40% 30% 70% / 30% 60% 40% 60%; }
+  100% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; }
+}
+
+@keyframes neon-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes counter-scroll {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+.animate-float-up {
+  animation: float-up 0.6s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* === Input Focus === */
+.cyber-input {
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  padding: 8px 14px;
+  font-size: var(--font-size-base);
+  transition: all var(--transition-normal);
+  outline: none;
+}
+
+.cyber-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3), 0 0 20px rgba(0, 229, 255, 0.1);
+}
+
+.cyber-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-secondary: var(--color-secondary);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* === Layout: Sidebar + Main === */
+      .app-layout {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* === Sidebar === */
+      .sidebar {
+        width: var(--sidebar-width);
+        min-height: 100vh;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--color-border-glass);
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: var(--z-sidebar);
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: var(--glass-blur-heavy);
+        -webkit-backdrop-filter: var(--glass-blur-heavy);
+      }
+
+      .sidebar-brand {
+        padding: var(--space-lg) var(--space-md);
+        border-bottom: 1px solid var(--color-border-glass);
+        text-align: center;
+      }
+
+      .sidebar-brand h1 {
+        font-family: var(--font-family-display);
+        font-size: var(--font-size-lg);
+        color: var(--color-primary);
+        text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        letter-spacing: var(--letter-spacing-wider);
+      }
+
+      .sidebar-brand p {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+        margin-top: var(--space-xs);
+      }
+
+      .sidebar-nav {
+        flex: 1;
+        padding: var(--space-md) 0;
+        overflow-y: auto;
+      }
+
+      .sidebar-section {
+        padding: var(--space-xs) var(--space-md);
+        margin-top: var(--space-sm);
+      }
+
+      .sidebar-section-title {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-wider);
+        padding: var(--space-xs) var(--space-sm);
+        margin-bottom: var(--space-xs);
+      }
+
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: 10px var(--space-md);
+        margin: 2px var(--space-sm);
+        border-radius: var(--radius-md);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: var(--font-size-base);
+        transition: all var(--transition-fast);
+        cursor: pointer;
+        border: 1px solid transparent;
+      }
+
+      .sidebar-item:hover {
+        background: rgba(0, 229, 255, 0.08);
+        color: var(--color-text-primary);
+      }
+
+      .sidebar-item.active {
+        background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 229, 255, 0.05));
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        box-shadow: var(--glow-primary);
+      }
+
+      .sidebar-item .item-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        opacity: 0.7;
+      }
+
+      .sidebar-item.active .item-icon {
+        opacity: 1;
+      }
+
+      /* === Header === */
+      .app-header {
+        height: var(--header-height);
+        background: var(--header-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border-bottom: 1px solid var(--color-border-glass);
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        right: 0;
+        z-index: var(--z-header);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 var(--space-xl);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+      }
+
+      .header-left .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-tertiary);
+      }
+
+      .header-left .breadcrumb span {
+        color: var(--color-text-primary);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-lg);
+      }
+
+      .header-right .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-bg-primary);
+      }
+
+      .header-right .user-name {
+        font-size: var(--font-size-base);
+        color: var(--color-text-primary);
+      }
+
+      /* === Main Content Area === */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: calc(var(--header-height) + var(--space-xl)) var(--space-xl) var(--space-2xl);
+        min-height: 100vh;
+      }
+
+      /* === Approval Timeline === */
+      .approval-timeline {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        position: relative;
+        padding: var(--space-lg) var(--space-xl);
+        gap: 0;
+      }
+
+      .timeline-node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        flex: 0 0 auto;
+        min-width: 80px;
+      }
+
+      .timeline-node-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--space-sm);
+        position: relative;
+        transition: all var(--transition-normal);
+      }
+
+      .timeline-node-circle.completed {
+        background: rgba(255, 184, 0, 0.15);
+        border: 2px solid var(--color-secondary);
+        box-shadow: 0 0 12px rgba(255, 184, 0, 0.5), 0 0 24px rgba(255, 184, 0, 0.2);
+        color: var(--color-secondary);
+      }
+
+      .timeline-node-circle.current {
+        background: rgba(0, 229, 255, 0.15);
+        border: 2px solid var(--color-primary);
+        animation: pulse-glow 2s ease-in-out infinite;
+        color: var(--color-primary);
+      }
+
+      .timeline-node-circle.pending {
+        background: rgba(232, 236, 244, 0.06);
+        border: 2px solid rgba(232, 236, 244, 0.15);
+        color: var(--color-text-disabled);
+      }
+
+      .timeline-node-label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .timeline-node-label.completed {
+        color: var(--color-secondary);
+        text-shadow: 0 0 6px rgba(255, 184, 0, 0.4);
+      }
+
+      .timeline-node-label.current {
+        color: var(--color-primary);
+        text-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
+      }
+
+      .timeline-node-label.pending {
+        color: var(--color-text-disabled);
+      }
+
+      .timeline-connector {
+        flex: 1;
+        height: 3px;
+        margin-top: 22px;
+        border-radius: 2px;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .timeline-connector.completed {
+        background: rgba(255, 184, 0, 0.3);
+        background-size: 200% 100%;
+        background-image: linear-gradient(90deg, var(--color-secondary), var(--color-primary), var(--color-secondary));
+        animation: neon-flow 3s ease infinite;
+      }
+
+      .timeline-connector.pending {
+        background: rgba(232, 236, 244, 0.08);
+      }
+
+      .timeline-connector.active-pulse {
+        background: rgba(0, 229, 255, 0.2);
+        background-size: 200% 100%;
+        background-image: linear-gradient(90deg, var(--color-secondary), var(--color-primary), rgba(0, 229, 255, 0.1));
+        animation: neon-flow 2s ease infinite;
+      }
+
+      /* === Timeline Detail Cards === */
+      .timeline-detail-card {
+        padding: var(--space-lg);
+        margin-bottom: var(--space-md);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .timeline-detail-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+      }
+
+      .timeline-detail-card.gold-border::before {
+        background: var(--color-secondary);
+        box-shadow: 0 0 8px rgba(255, 184, 0, 0.5);
+      }
+
+      .timeline-detail-card.blue-border::before {
+        background: var(--color-primary);
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        animation: breathe 2s ease-in-out infinite;
+      }
+
+      .detail-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: var(--space-sm);
+        font-size: var(--font-size-base);
+      }
+
+      .detail-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .detail-label {
+        color: var(--color-text-tertiary);
+        min-width: 80px;
+        flex-shrink: 0;
+      }
+
+      .detail-value {
+        color: var(--color-text-primary);
+      }
+
+      .detail-opinion {
+        color: var(--color-text-secondary);
+        line-height: var(--line-height-relaxed);
+        padding: var(--space-sm) var(--space-md);
+        background: rgba(0, 229, 255, 0.03);
+        border-radius: var(--radius-sm);
+        border-left: 2px solid rgba(232, 236, 244, 0.08);
+        margin-top: var(--space-sm);
+      }
+
+      /* === Asset Info Grid === */
+      .asset-info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-md);
+      }
+
+      .asset-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+      }
+
+      .asset-info-item .info-label {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-wide);
+      }
+
+      .asset-info-item .info-value {
+        font-size: var(--font-size-md);
+        color: var(--color-text-primary);
+        font-weight: var(--font-weight-medium);
+      }
+
+      /* === Status Badge === */
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+      }
+
+      .status-badge.warning {
+        background: var(--color-warning-faint);
+        border: 1px solid rgba(255, 138, 0, 0.3);
+        color: var(--color-warning);
+        text-shadow: 0 0 6px rgba(255, 138, 0, 0.4);
+        animation: pulse-warning 2s ease-in-out infinite;
+      }
+
+      .status-badge.success {
+        background: var(--color-success-faint);
+        border: 1px solid rgba(0, 255, 148, 0.3);
+        color: var(--color-success);
+        text-shadow: 0 0 6px rgba(0, 255, 148, 0.4);
+      }
+
+      .status-badge .pulse-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: var(--radius-full);
+        background: currentColor;
+        animation: breathe 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse-warning {
+        0%, 100% { box-shadow: 0 0 6px rgba(255, 138, 0, 0.3); }
+        50% { box-shadow: 0 0 16px rgba(255, 138, 0, 0.6), 0 0 32px rgba(255, 138, 0, 0.2); }
+      }
+
+      /* === Action Area === */
+      .reject-textarea {
+        width: 100%;
+        min-height: 80px;
+        background: var(--color-bg-input);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-md);
+        color: var(--color-text-primary);
+        padding: var(--space-md);
+        font-size: var(--font-size-base);
+        font-family: var(--font-family-body);
+        resize: vertical;
+        outline: none;
+        transition: all var(--transition-normal);
+      }
+
+      .reject-textarea:focus {
+        border-color: var(--color-danger);
+        box-shadow: 0 0 10px rgba(255, 46, 99, 0.3), 0 0 20px rgba(255, 46, 99, 0.1);
+      }
+
+      .reject-textarea::placeholder {
+        color: var(--color-text-tertiary);
+      }
+
+      .neon-btn-success {
+        background: linear-gradient(135deg, rgba(0, 255, 148, 0.2), rgba(0, 255, 148, 0.1));
+        border: 1px solid var(--color-success);
+        color: var(--color-success);
+        padding: 10px 28px;
+        border-radius: var(--radius-md);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        box-shadow: var(--glow-success);
+        text-shadow: 0 0 8px rgba(0, 255, 148, 0.5);
+        font-size: var(--font-size-md);
+      }
+
+      .neon-btn-success:hover {
+        background: linear-gradient(135deg, rgba(0, 255, 148, 0.3), rgba(0, 255, 148, 0.2));
+        box-shadow: 0 0 15px rgba(0, 255, 148, 0.6), 0 0 30px rgba(0, 255, 148, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .neon-btn-danger-lg {
+        background: linear-gradient(135deg, rgba(255, 46, 99, 0.2), rgba(255, 46, 99, 0.1));
+        border: 1px solid var(--color-danger);
+        color: var(--color-danger);
+        padding: 10px 28px;
+        border-radius: var(--radius-md);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        box-shadow: var(--glow-danger);
+        text-shadow: 0 0 8px rgba(255, 46, 99, 0.5);
+        font-size: var(--font-size-md);
+      }
+
+      .neon-btn-danger-lg:hover {
+        background: linear-gradient(135deg, rgba(255, 46, 99, 0.3), rgba(255, 46, 99, 0.2));
+        box-shadow: 0 0 15px rgba(255, 46, 99, 0.6), 0 0 30px rgba(255, 46, 99, 0.3);
+        transform: translateY(-2px);
+      }
+
+      /* === Back Button === */
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: var(--font-size-base);
+        transition: all var(--transition-fast);
+        cursor: pointer;
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-sm);
+        margin-right: var(--space-sm);
+      }
+
+      .back-btn:hover {
+        color: var(--color-primary);
+        text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+        background: rgba(0, 229, 255, 0.05);
+      }
+
+      /* === Section Title === */
+      .section-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary);
+        margin-bottom: var(--space-md);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .section-title .title-icon {
+        color: var(--color-primary);
+      }
+
+      /* === Reviewing indicator === */
+      .reviewing-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: 2px 10px;
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-medium);
+        background: var(--color-primary-faint);
+        border: 1px solid rgba(0, 229, 255, 0.3);
+        color: var(--color-primary);
+        text-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
+      }
+
+      .reviewing-badge .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: var(--radius-full);
+        background: var(--color-primary);
+        animation: breathe 1.5s ease-in-out infinite;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <div class="app-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" data-dom-id="sidebar">
+            <div class="sidebar-brand">
+                <h1>NEPU-FAMS</h1>
+                <p>Fixed Assets Management</p>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">主导航</div>
+                    <a class="sidebar-item" data-dom-id="nav-dashboard">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        <span>仪表盘</span>
+                    </a>
+                    <a class="sidebar-item" data-dom-id="nav-assets">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                        <span>资产管理</span>
+                    </a>
+                    <a class="sidebar-item active" data-dom-id="nav-borrow">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg>
+                        <span>领用管理</span>
+                    </a>
+                    <a class="sidebar-item" data-dom-id="nav-repair">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                        <span>维修管理</span>
+                    </a>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">审核中心</div>
+                    <a class="sidebar-item" data-dom-id="nav-scrap">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        <span>报废管理</span>
+                    </a>
+                    <a class="sidebar-item" data-dom-id="nav-inventory">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 14h20"></path><path d="M12 2v6"></path><path d="M12 10v6"></path></svg>
+                        <span>盘点管理</span>
+                    </a>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">系统</div>
+                    <a class="sidebar-item" data-dom-id="nav-users">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <span>用户管理</span>
+                    </a>
+                    <a class="sidebar-item" data-dom-id="nav-logs">
+                        <svg class="item-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                        <span>操作日志</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- ===== MAIN CONTENT AREA ===== -->
+        <div style="flex: 1;">
+
+            <!-- ===== HEADER ===== -->
+            <header class="app-header" data-dom-id="header">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <span>领用管理</span>
+                        <span style="color: var(--color-text-tertiary);">/</span>
+                        <span>审批详情</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-name">管理员</div>
+                    <div class="user-avatar">A</div>
+                </div>
+            </header>
+
+            <!-- ===== PAGE CONTENT ===== -->
+            <main class="main-content">
+
+                <!-- 1. PAGE TITLE BAR -->
+                <div class="glass-card" style="padding: var(--space-lg); margin-bottom: var(--space-lg); display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center;">
+                        <a class="back-btn" data-dom-id="back-assets" title="返回">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        </a>
+                        <div>
+                            <h2 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); margin: 0;">领用审批 - LY-2024-0089</h2>
+                        </div>
+                    </div>
+                    <div class="status-badge warning">
+                        <span class="pulse-dot"></span>
+                        <span>学院审核中</span>
+                    </div>
+                </div>
+
+                <!-- 2. APPROVAL TIMELINE -->
+                <div class="glass-card" style="padding: var(--space-lg); margin-bottom: var(--space-lg);">
+                    <div class="approval-timeline">
+
+                        <!-- Node 1: 提交申请 - COMPLETED -->
+                        <div class="timeline-node">
+                            <div class="timeline-node-circle completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span class="timeline-node-label completed">提交申请</span>
+                        </div>
+
+                        <!-- Connector 1 (completed) -->
+                        <div class="timeline-connector completed"></div>
+
+                        <!-- Node 2: 学院审核 - CURRENT -->
+                        <div class="timeline-node">
+                            <div class="timeline-node-circle current">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </div>
+                            <span class="timeline-node-label current">学院审核</span>
+                        </div>
+
+                        <!-- Connector 2 (active-pulse: current flowing toward next) -->
+                        <div class="timeline-connector active-pulse"></div>
+
+                        <!-- Node 3: 校级审核 - PENDING -->
+                        <div class="timeline-node">
+                            <div class="timeline-node-circle pending">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </div>
+                            <span class="timeline-node-label pending">校级审核</span>
+                        </div>
+
+                        <!-- Connector 3 (pending) -->
+                        <div class="timeline-connector pending"></div>
+
+                        <!-- Node 4: 确认领用 - PENDING -->
+                        <div class="timeline-node">
+                            <div class="timeline-node-circle pending">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </div>
+                            <span class="timeline-node-label pending">确认领用</span>
+                        </div>
+
+                        <!-- Connector 4 (pending) -->
+                        <div class="timeline-connector pending"></div>
+
+                        <!-- Node 5: 已完成 - PENDING -->
+                        <div class="timeline-node">
+                            <div class="timeline-node-circle pending">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline><circle cx="12" cy="12" r="10"></circle></svg>
+                            </div>
+                            <span class="timeline-node-label pending">已完成</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 3. TIMELINE DETAIL SECTIONS -->
+                <div class="section-title">
+                    <svg class="title-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                    审批进度详情
+                </div>
+
+                <!-- Step 1: 提交申请 - gold border -->
+                <div class="glass-card timeline-detail-card gold-border" style="margin-bottom: var(--space-md);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md);">
+                        <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <svg style="color: var(--color-secondary);" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span style="font-weight: var(--font-weight-semibold); color: var(--color-secondary);">提交申请</span>
+                        </div>
+                        <span class="status-badge success" style="font-size: var(--font-size-xs); padding: 2px 8px;">已完成</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">操作人:</span>
+                        <span class="detail-value">张三 (Computer Science)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">时间:</span>
+                        <span class="detail-value" style="font-family: var(--font-family-mono); font-size: var(--font-size-sm);">2024-06-15 09:23:45</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">审批意见:</span>
+                    </div>
+                    <div class="detail-opinion">申请领用DELL Latitude 5520笔记本电脑一台，用于科研项目开发</div>
+                </div>
+
+                <!-- Step 2: 学院审核 - blue border, current -->
+                <div class="glass-card timeline-detail-card blue-border" style="margin-bottom: var(--space-lg);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md);">
+                        <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <svg style="color: var(--color-primary);" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span style="font-weight: var(--font-weight-semibold); color: var(--color-primary);">学院审核</span>
+                        </div>
+                        <span class="reviewing-badge">
+                            <span class="dot"></span>
+                            审核中
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">操作人:</span>
+                        <span class="detail-value">李四 (学院设备管理员)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">时间:</span>
+                        <span class="detail-value" style="font-family: var(--font-family-mono); font-size: var(--font-size-sm);">2024-06-15 14:30:12</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">审批意见:</span>
+                    </div>
+                    <div class="detail-opinion">已核实资产库存，同意申请</div>
+                </div>
+
+                <!-- 4. ASSET INFO CARD -->
+                <div class="section-title">
+                    <svg class="title-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    资产信息
+                </div>
+                <div class="glass-card" style="padding: var(--space-lg); margin-bottom: var(--space-lg);">
+                    <div class="asset-info-grid">
+                        <div class="asset-info-item">
+                            <span class="info-label">资产编号</span>
+                            <span class="info-value" style="font-family: var(--font-family-mono); color: var(--color-primary);">ZC-2024-0156</span>
+                        </div>
+                        <div class="asset-info-item">
+                            <span class="info-label">资产名称</span>
+                            <span class="info-value">DELL Latitude 5520笔记本电脑</span>
+                        </div>
+                        <div class="asset-info-item">
+                            <span class="info-label">分类</span>
+                            <span class="info-value">电子设备</span>
+                        </div>
+                        <div class="asset-info-item">
+                            <span class="info-label">规格型号</span>
+                            <span class="info-value" style="font-family: var(--font-family-mono); font-size: var(--font-size-sm);">i7-12700H/16GB/512GB</span>
+                        </div>
+                        <div class="asset-info-item">
+                            <span class="info-label">原值</span>
+                            <span class="info-value" style="color: var(--color-secondary); font-weight: var(--font-weight-bold); font-family: var(--font-family-mono);">&yen;8,999.00</span>
+                        </div>
+                        <div class="asset-info-item">
+                            <span class="info-label">当前状态</span>
+                            <span class="status-badge success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                闲置
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. ACTION BUTTONS -->
+                <div class="glass-card" style="padding: var(--space-lg);">
+                    <div class="section-title" style="margin-bottom: var(--space-md);">
+                        <svg class="title-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        审批操作
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md);">
+                        <button class="neon-btn-success" id="btn-approve">
+                            <span style="display: flex; align-items: center; gap: var(--space-sm);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                通过
+                            </span>
+                        </button>
+                        <button class="neon-btn-danger-lg" id="btn-reject">
+                            <span style="display: flex; align-items: center; gap: var(--space-sm);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                                驳回
+                            </span>
+                        </button>
+                    </div>
+                    <div id="reject-reason-area" style="display: none;">
+                        <label style="display: block; font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin-bottom: var(--space-sm);">驳回原因</label>
+                        <textarea class="reject-textarea" id="reject-reason" placeholder="请输入驳回原因..."></textarea>
+                        <div style="margin-top: var(--space-md); display: flex; gap: var(--space-md);">
+                            <button class="neon-btn-danger-lg" id="btn-confirm-reject">
+                                <span style="display: flex; align-items: center; gap: var(--space-sm);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    确认驳回
+                                </span>
+                            </button>
+                            <button class="neon-btn" id="btn-cancel-reject">
+                                <span style="display: flex; align-items: center; gap: var(--space-sm);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    取消
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+    </div>
+
+    <script>
+        // Toggle reject reason textarea
+        const btnReject = document.getElementById('btn-reject');
+        const rejectArea = document.getElementById('reject-reason-area');
+        const btnCancel = document.getElementById('btn-cancel-reject');
+
+        if (btnReject) {
+            btnReject.addEventListener('click', function() {
+                rejectArea.style.display = 'block';
+                this.style.display = 'none';
+            });
+        }
+
+        if (btnCancel) {
+            btnCancel.addEventListener('click', function() {
+                rejectArea.style.display = 'none';
+                document.getElementById('btn-reject').style.display = '';
+            });
+        }
+    </script>
+</body>
+</html>

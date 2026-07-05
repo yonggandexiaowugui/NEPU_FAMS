@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEPU-FAMS 维修工单</title>
+    <style id="theme-vars">
+/* NEPU-FAMS Design System - Cyberpunk Sci-Fi Admin Console */
+/* Brand CSS Variables */
+
+:root {
+  /* === Core Background System === */
+  --color-bg-primary: #080C16;
+  --color-bg-secondary: #0D1321;
+  --color-bg-tertiary: #111827;
+  --color-bg-card: rgba(13, 19, 33, 0.7);
+  --color-bg-card-hover: rgba(17, 24, 39, 0.85);
+  --color-bg-glass: rgba(13, 19, 33, 0.6);
+  --color-bg-overlay: rgba(8, 12, 22, 0.85);
+  --color-bg-input: rgba(13, 19, 33, 0.8);
+
+  /* === Primary Brand - Electric Petroleum Blue === */
+  --color-primary: #00E5FF;
+  --color-primary-rgb: 0, 229, 255;
+  --color-primary-dim: rgba(0, 229, 255, 0.6);
+  --color-primary-faint: rgba(0, 229, 255, 0.15);
+  --color-primary-glow: rgba(0, 229, 255, 0.4);
+  --color-primary-dark: #00B8CC;
+  --color-primary-light: #33EBFF;
+
+  /* === Secondary Brand - Neon Industrial Gold === */
+  --color-secondary: #FFB800;
+  --color-secondary-rgb: 255, 184, 0;
+  --color-secondary-dim: rgba(255, 184, 0, 0.6);
+  --color-secondary-faint: rgba(255, 184, 0, 0.15);
+  --color-secondary-glow: rgba(255, 184, 0, 0.4);
+
+  /* === Functional Colors === */
+  --color-success: #00FF94;
+  --color-success-rgb: 0, 255, 148;
+  --color-success-dim: rgba(0, 255, 148, 0.6);
+  --color-success-faint: rgba(0, 255, 148, 0.15);
+  --color-success-glow: rgba(0, 255, 148, 0.4);
+
+  --color-warning: #FF8A00;
+  --color-warning-rgb: 255, 138, 0;
+  --color-warning-dim: rgba(255, 138, 0, 0.6);
+  --color-warning-faint: rgba(255, 138, 0, 0.15);
+  --color-warning-glow: rgba(255, 138, 0, 0.4);
+
+  --color-danger: #FF2E63;
+  --color-danger-rgb: 255, 46, 99;
+  --color-danger-dim: rgba(255, 46, 99, 0.6);
+  --color-danger-faint: rgba(255, 46, 99, 0.15);
+  --color-danger-glow: rgba(255, 46, 99, 0.4);
+
+  --color-info: #00E5FF;
+
+  /* === Text Colors === */
+  --color-text-primary: #E8ECF4;
+  --color-text-secondary: rgba(232, 236, 244, 0.7);
+  --color-text-tertiary: rgba(232, 236, 244, 0.45);
+  --color-text-disabled: rgba(232, 236, 244, 0.25);
+  --color-text-inverse: #080C16;
+  --color-text-link: #00E5FF;
+  --color-text-glow: rgba(232, 236, 244, 0.9);
+
+  /* === Border Colors === */
+  --color-border-primary: rgba(0, 229, 255, 0.2);
+  --color-border-hover: rgba(0, 229, 255, 0.4);
+  --color-border-focus: rgba(0, 229, 255, 0.6);
+  --color-border-subtle: rgba(232, 236, 244, 0.08);
+  --color-border-glass: rgba(0, 229, 255, 0.12);
+
+  /* === Glow / Neon Effects === */
+  --glow-primary: 0 0 10px rgba(0, 229, 255, 0.5), 0 0 20px rgba(0, 229, 255, 0.2);
+  --glow-secondary: 0 0 10px rgba(255, 184, 0, 0.5), 0 0 20px rgba(255, 184, 0, 0.2);
+  --glow-success: 0 0 10px rgba(0, 255, 148, 0.5), 0 0 20px rgba(0, 255, 148, 0.2);
+  --glow-danger: 0 0 10px rgba(255, 46, 99, 0.5), 0 0 20px rgba(255, 46, 99, 0.2);
+  --glow-warning: 0 0 10px rgba(255, 138, 0, 0.5), 0 0 20px rgba(255, 138, 0, 0.2);
+
+  /* === Glass Effect === */
+  --glass-blur: blur(16px);
+  --glass-blur-heavy: blur(24px);
+  --glass-bg: rgba(13, 19, 33, 0.65);
+  --glass-border: 1px solid rgba(0, 229, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(0, 229, 255, 0.06);
+
+  /* === Radius System === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Spacing === */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* === Typography === */
+  --font-family-display: 'Orbitron', 'Rajdhani', 'Microsoft YaHei', sans-serif;
+  --font-family-body: 'Inter', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 40px;
+  --font-size-5xl: 48px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.05em;
+  --letter-spacing-wider: 0.1em;
+
+  /* === Shadow System === */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(0, 229, 255, 0.06);
+  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 229, 255, 0.1);
+
+  /* === Sidebar === */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --sidebar-bg: rgba(8, 12, 22, 0.95);
+
+  /* === Header === */
+  --header-height: 56px;
+  --header-bg: rgba(8, 12, 22, 0.8);
+
+  /* === Transitions === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+  --transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === Z-Index Scale === */
+  --z-sidebar: 100;
+  --z-header: 200;
+  --z-dropdown: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+}
+
+/* === Global Base Styles === */
+html {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family-body);
+  background: var(--color-bg-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* === Utility Classes === */
+.text-glow {
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6), 0 0 16px rgba(0, 229, 255, 0.3);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 8px rgba(255, 184, 0, 0.6), 0 0 16px rgba(255, 184, 0, 0.3);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.glass-card-hover:hover {
+  background: var(--color-bg-card-hover);
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-card), var(--glow-primary);
+  transform: translateY(-2px) scale(1.02);
+  transition: all var(--transition-normal);
+}
+
+.neon-border {
+  border: 1px solid var(--color-border-primary);
+  box-shadow: var(--glow-primary);
+}
+
+.neon-border-gold {
+  border: 1px solid rgba(255, 184, 0, 0.3);
+  box-shadow: var(--glow-secondary);
+}
+
+.neon-text {
+  color: var(--color-primary);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.neon-btn {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(0, 229, 255, 0.1));
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 8px 20px;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--glow-primary);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.neon-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.3), rgba(0, 229, 255, 0.2));
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.6), 0 0 30px rgba(0, 229, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.neon-btn-gold {
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.2), rgba(255, 184, 0, 0.1));
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  box-shadow: var(--glow-secondary);
+  text-shadow: 0 0 8px rgba(255, 184, 0, 0.5);
+}
+
+.neon-btn-gold:hover {
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.3), rgba(255, 184, 0, 0.2));
+  box-shadow: 0 0 15px rgba(255, 184, 0, 0.6), 0 0 30px rgba(255, 184, 0, 0.3);
+}
+
+.neon-btn-danger {
+  background: linear-gradient(135deg, rgba(255, 46, 99, 0.2), rgba(255, 46, 99, 0.1));
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  box-shadow: var(--glow-danger);
+}
+
+/* === Neon Status Badges === */
+.status-idle {
+  background: var(--color-success-faint);
+  border: 1px solid rgba(0, 255, 148, 0.3);
+  color: var(--color-success);
+  text-shadow: 0 0 6px rgba(0, 255, 148, 0.4);
+}
+
+.status-in-use {
+  background: var(--color-warning-faint);
+  border: 1px solid rgba(255, 138, 0, 0.3);
+  color: var(--color-warning);
+  text-shadow: 0 0 6px rgba(255, 138, 0, 0.4);
+}
+
+.status-repair {
+  background: rgba(255, 184, 0, 0.15);
+  border: 1px solid rgba(255, 184, 0, 0.3);
+  color: var(--color-secondary);
+  text-shadow: 0 0 6px rgba(255, 184, 0, 0.4);
+}
+
+.status-scrapped {
+  background: var(--color-danger-faint);
+  border: 1px solid rgba(255, 46, 99, 0.3);
+  color: var(--color-danger);
+  text-shadow: 0 0 6px rgba(255, 46, 99, 0.4);
+}
+
+.status-loss {
+  background: rgba(232, 236, 244, 0.08);
+  border: 1px solid rgba(232, 236, 244, 0.15);
+  color: var(--color-text-tertiary);
+}
+
+/* === Table Styles === */
+.cyber-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.cyber-table thead th {
+  background: rgba(0, 229, 255, 0.08);
+  border-bottom: 1px solid var(--color-border-primary);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.cyber-table tbody tr {
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: all var(--transition-fast);
+}
+
+.cyber-table tbody tr:hover {
+  background: rgba(0, 229, 255, 0.05);
+  box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.03);
+}
+
+.cyber-table tbody td {
+  padding: 12px 16px;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.4);
+}
+
+/* === Animations === */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.8), 0 0 40px rgba(0, 229, 255, 0.3); }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scan-line {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+@keyframes liquid-wave {
+  0% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; }
+  50% { border-radius: 60% 40% 30% 70% / 30% 60% 40% 60%; }
+  100% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; }
+}
+
+@keyframes neon-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes counter-scroll {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+.animate-float-up {
+  animation: float-up 0.6s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* === Input Focus === */
+.cyber-input {
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  padding: 8px 14px;
+  font-size: var(--font-size-base);
+  transition: all var(--transition-normal);
+  outline: none;
+}
+
+.cyber-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3), 0 0 20px rgba(0, 229, 255, 0.1);
+}
+
+.cyber-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-secondary: var(--color-secondary);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-text">NEPU</div>
+        <div class="logo-sub">FAMS v2.0</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" data-dom-id="nav-dashboard" href="#">
+          <span class="nav-icon">&#9632;</span> 仪表盘
+        </a>
+        <a class="nav-item" data-dom-id="nav-assets" href="#">
+          <span class="nav-icon">&#9635;</span> 资产管理
+        </a>
+        <a class="nav-item" data-dom-id="nav-approval" href="#">
+          <span class="nav-icon">&#9998;</span> 领用管理
+        </a>
+        <a class="nav-item active" data-dom-id="nav-repair" href="#">
+          <span class="nav-icon">&#9874;</span> 维修管理
+        </a>
+        <a class="nav-item" data-dom-id="nav-scrap" href="#">
+          <span class="nav-icon">&#10006;</span> 报废管理
+        </a>
+        <a class="nav-item" data-dom-id="nav-inventory" href="#">
+          <span class="nav-icon">&#9881;</span> 盘点管理
+        </a>
+        <a class="nav-item" data-dom-id="nav-reports" href="#">
+          <span class="nav-icon">&#9733;</span> 统计报表
+        </a>
+        <a class="nav-item" data-dom-id="nav-system" href="#">
+          <span class="nav-icon">&#9881;</span> 系统管理
+        </a>
+        <a class="nav-item" data-dom-id="nav-profile" href="#">
+          <span class="nav-icon">&#9787;</span> 个人中心
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ===== TOP HEADER ===== -->
+    <header class="top-header">
+      <div class="header-title">NEPU-FAMS 固定资产管理系统</div>
+      <div class="header-actions">
+        <div class="notif-bell">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notif-badge"></span>
+        </div>
+        <span class="role-tag">资产管理员</span>
+        <div class="avatar-circle" title="管理员">A</div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+      <div class="content-inner">
+
+        <!-- ROW 1: KPI Cards -->
+        <section class="kpi-grid">
+          <div class="kpi-card glass-card glass-card-hover kpi-orange">
+            <div class="kpi-icon">&#9888;</div>
+            <div class="kpi-label">待处理工单</div>
+            <div class="kpi-value neon-orange">8</div>
+          </div>
+          <div class="kpi-card glass-card glass-card-hover kpi-blue">
+            <div class="kpi-icon">&#9202;</div>
+            <div class="kpi-label">维修中</div>
+            <div class="kpi-value neon-blue text-glow">12</div>
+          </div>
+          <div class="kpi-card glass-card glass-card-hover kpi-green">
+            <div class="kpi-icon">&#10003;</div>
+            <div class="kpi-label">已完成</div>
+            <div class="kpi-value neon-green">156</div>
+          </div>
+          <div class="kpi-card glass-card glass-card-hover kpi-gold">
+            <div class="kpi-icon">&#9733;</div>
+            <div class="kpi-label">本月完成率</div>
+            <div class="kpi-value neon-gold text-glow-gold">94.2%</div>
+          </div>
+        </section>
+
+        <!-- ROW 2: Work Order Card List -->
+        <div class="section-title">
+          <span class="title-icon">&#9874;</span>
+          维修工单列表
+        </div>
+        <section class="workorder-grid">
+
+          <!-- Work Order 1: Urgent - DELL Server HDD -->
+          <div class="workorder-card glass-card priority-urgent">
+            <div class="priority-border"></div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-top-row">
+                  <span class="order-id">WX-2024-0892</span>
+                  <span class="priority-badge urgent">紧急</span>
+                  <span class="status-badge status-progress">维修中</span>
+                </div>
+                <div class="card-title">DELL服务器硬盘故障维修</div>
+                <div class="card-meta">
+                  <div class="meta-row">
+                    <span class="meta-label">报修人:</span>
+                    <span class="meta-value">张三</span>
+                    <span style="color:var(--color-border-subtle)">|</span>
+                    <span class="meta-label">信息学院</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">报修时间:</span>
+                    <span class="meta-value" style="font-family:var(--font-family-mono)">2024-06-14 10:30</span>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9775;</span>
+                    <span class="meta-label">操作人:</span>
+                    <span class="bi-value">李工</span>
+                  </div>
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9202;</span>
+                    <span class="meta-label">预计完成:</span>
+                    <span class="bi-value">2024-06-15 18:00</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Vertical Progress Timeline - Step 2 of 3 (active) -->
+              <div class="progress-timeline">
+                <div class="timeline-track">
+                  <div class="timeline-fill liquid-red" style="height: 66.7%;"></div>
+                </div>
+                <div class="timeline-steps">
+                  <div class="timeline-step">
+                    <div class="timeline-node completed-red">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">提交报修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node active-red">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">派单维修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">维修完成</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Order 2: High - Projector Bulb -->
+          <div class="workorder-card glass-card priority-high">
+            <div class="priority-border"></div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-top-row">
+                  <span class="order-id">WX-2024-0891</span>
+                  <span class="priority-badge high">高</span>
+                  <span class="status-badge status-progress">维修中</span>
+                </div>
+                <div class="card-title">投影仪灯泡更换</div>
+                <div class="card-meta">
+                  <div class="meta-row">
+                    <span class="meta-label">报修人:</span>
+                    <span class="meta-value">王磊</span>
+                    <span style="color:var(--color-border-subtle)">|</span>
+                    <span class="meta-label">计算机学院</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">报修时间:</span>
+                    <span class="meta-value" style="font-family:var(--font-family-mono)">2024-06-13 14:15</span>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9775;</span>
+                    <span class="meta-label">操作人:</span>
+                    <span class="bi-value">陈工</span>
+                  </div>
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9202;</span>
+                    <span class="meta-label">预计完成:</span>
+                    <span class="bi-value">2024-06-16 12:00</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Vertical Progress Timeline - Step 2 of 3 (active) -->
+              <div class="progress-timeline">
+                <div class="timeline-track">
+                  <div class="timeline-fill liquid-orange" style="height: 66.7%;"></div>
+                </div>
+                <div class="timeline-steps">
+                  <div class="timeline-step">
+                    <div class="timeline-node completed-orange">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">提交报修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node active-orange">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">派单维修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">维修完成</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Order 3: High - Lab AC -->
+          <div class="workorder-card glass-card priority-high">
+            <div class="priority-border"></div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-top-row">
+                  <span class="order-id">WX-2024-0890</span>
+                  <span class="priority-badge high">高</span>
+                  <span class="status-badge status-pending">待处理</span>
+                </div>
+                <div class="card-title">实验室空调制冷异常</div>
+                <div class="card-meta">
+                  <div class="meta-row">
+                    <span class="meta-label">报修人:</span>
+                    <span class="meta-value">刘洋</span>
+                    <span style="color:var(--color-border-subtle)">|</span>
+                    <span class="meta-label">理学院</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">报修时间:</span>
+                    <span class="meta-value" style="font-family:var(--font-family-mono)">2024-06-14 09:20</span>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9775;</span>
+                    <span class="meta-label">操作人:</span>
+                    <span class="bi-value" style="color:var(--color-text-tertiary)">待分配</span>
+                  </div>
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9202;</span>
+                    <span class="meta-label">预计完成:</span>
+                    <span class="bi-value">2024-06-17 18:00</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Vertical Progress Timeline - Step 1 of 3 (just submitted) -->
+              <div class="progress-timeline">
+                <div class="timeline-track">
+                  <div class="timeline-fill liquid-orange" style="height: 33.3%;"></div>
+                </div>
+                <div class="timeline-steps">
+                  <div class="timeline-step">
+                    <div class="timeline-node active-orange">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">提交报修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">派单维修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">维修完成</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Order 4: Medium - Printer Jam -->
+          <div class="workorder-card glass-card priority-medium">
+            <div class="priority-border"></div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-top-row">
+                  <span class="order-id">WX-2024-0889</span>
+                  <span class="priority-badge medium">中</span>
+                  <span class="status-badge status-progress">维修中</span>
+                </div>
+                <div class="card-title">打印机卡纸维修</div>
+                <div class="card-meta">
+                  <div class="meta-row">
+                    <span class="meta-label">报修人:</span>
+                    <span class="meta-value">赵敏</span>
+                    <span style="color:var(--color-border-subtle)">|</span>
+                    <span class="meta-label">经管学院</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">报修时间:</span>
+                    <span class="meta-value" style="font-family:var(--font-family-mono)">2024-06-12 16:45</span>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9775;</span>
+                    <span class="meta-label">操作人:</span>
+                    <span class="bi-value">王工</span>
+                  </div>
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9202;</span>
+                    <span class="meta-label">预计完成:</span>
+                    <span class="bi-value">2024-06-15 17:00</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Vertical Progress Timeline - Step 2 of 3 (active) -->
+              <div class="progress-timeline">
+                <div class="timeline-track">
+                  <div class="timeline-fill liquid" style="height: 66.7%;"></div>
+                </div>
+                <div class="timeline-steps">
+                  <div class="timeline-step">
+                    <div class="timeline-node completed">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">提交报修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node active">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">派单维修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">维修完成</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Order 5: Medium - Desk Repair -->
+          <div class="workorder-card glass-card priority-medium">
+            <div class="priority-border"></div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-top-row">
+                  <span class="order-id">WX-2024-0888</span>
+                  <span class="priority-badge medium">中</span>
+                  <span class="status-badge status-completed">已完成</span>
+                </div>
+                <div class="card-title">办公桌椅紧固维修</div>
+                <div class="card-meta">
+                  <div class="meta-row">
+                    <span class="meta-label">报修人:</span>
+                    <span class="meta-value">孙涛</span>
+                    <span style="color:var(--color-border-subtle)">|</span>
+                    <span class="meta-label">外语学院</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">报修时间:</span>
+                    <span class="meta-value" style="font-family:var(--font-family-mono)">2024-06-10 11:20</span>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9775;</span>
+                    <span class="meta-label">操作人:</span>
+                    <span class="bi-value">张工</span>
+                  </div>
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#10003;</span>
+                    <span class="meta-label">完成时间:</span>
+                    <span class="bi-value">2024-06-11 15:30</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Vertical Progress Timeline - Step 3 of 3 (completed) -->
+              <div class="progress-timeline">
+                <div class="timeline-track">
+                  <div class="timeline-fill liquid-green" style="height: 100%;"></div>
+                </div>
+                <div class="timeline-steps">
+                  <div class="timeline-step">
+                    <div class="timeline-node completed-green">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">提交报修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node completed-green">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">派单维修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node completed-green">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">维修完成</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Order 6: Low - Lock Replacement -->
+          <div class="workorder-card glass-card priority-low">
+            <div class="priority-border"></div>
+            <div class="card-body">
+              <div class="card-info">
+                <div class="card-top-row">
+                  <span class="order-id">WX-2024-0887</span>
+                  <span class="priority-badge low">低</span>
+                  <span class="status-badge status-pending">待处理</span>
+                </div>
+                <div class="card-title">门锁更换申请</div>
+                <div class="card-meta">
+                  <div class="meta-row">
+                    <span class="meta-label">报修人:</span>
+                    <span class="meta-value">周芳</span>
+                    <span style="color:var(--color-border-subtle)">|</span>
+                    <span class="meta-label">艺术学院</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">报修时间:</span>
+                    <span class="meta-value" style="font-family:var(--font-family-mono)">2024-06-14 08:50</span>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9775;</span>
+                    <span class="meta-label">操作人:</span>
+                    <span class="bi-value" style="color:var(--color-text-tertiary)">待分配</span>
+                  </div>
+                  <div class="bottom-item">
+                    <span class="bi-icon">&#9202;</span>
+                    <span class="meta-label">预计完成:</span>
+                    <span class="bi-value">2024-06-20 18:00</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Vertical Progress Timeline - Step 1 of 3 (just submitted) -->
+              <div class="progress-timeline">
+                <div class="timeline-track">
+                  <div class="timeline-fill liquid" style="height: 33.3%;"></div>
+                </div>
+                <div class="timeline-steps">
+                  <div class="timeline-step">
+                    <div class="timeline-node active">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">提交报修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">派单维修</span>
+                  </div>
+                  <div class="timeline-step">
+                    <div class="timeline-node">
+                      <div class="node-inner"></div>
+                    </div>
+                    <span class="timeline-label">维修完成</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+
+    <script>lucide.createIcons();</script>
+
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ====== REPAIR PAGE LAYOUT ====== */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        background:
+          repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,229,255,0.03) 39px, rgba(0,229,255,0.03) 40px),
+          repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,229,255,0.03) 39px, rgba(0,229,255,0.03) 40px),
+          var(--color-bg-primary);
+        background-attachment: fixed;
+      }
+
+      /* ---- Sidebar ---- */
+      .sidebar {
+        position: fixed;
+        left: 0; top: 0;
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--color-border-glass);
+        z-index: var(--z-sidebar);
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: var(--glass-blur-heavy);
+        -webkit-backdrop-filter: var(--glass-blur-heavy);
+      }
+
+      .sidebar-logo {
+        padding: var(--space-lg);
+        text-align: center;
+        border-bottom: 1px solid var(--color-border-subtle);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sidebar-logo::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 10%; right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--color-primary-dim), transparent);
+        animation: breathe 3s ease-in-out infinite;
+      }
+
+      .logo-text {
+        font-family: var(--font-family-display);
+        font-size: 28px;
+        font-weight: var(--font-weight-bold);
+        letter-spacing: 0.15em;
+        background: linear-gradient(180deg, #E8ECF4 0%, #8899AA 40%, #556677 60%, #AABBCC 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
+        filter: drop-shadow(0 0 12px rgba(0,229,255,0.4));
+        animation: logo-breathe 4s ease-in-out infinite;
+        position: relative;
+      }
+
+      @keyframes logo-breathe {
+        0%, 100% {
+          filter: drop-shadow(0 0 8px rgba(0,229,255,0.3));
+        }
+        50% {
+          filter: drop-shadow(0 0 20px rgba(0,229,255,0.6)) drop-shadow(0 0 40px rgba(0,229,255,0.2));
+        }
+      }
+
+      .logo-sub {
+        font-family: var(--font-family-mono);
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+        letter-spacing: var(--letter-spacing-wider);
+        margin-top: 4px;
+      }
+
+      /* ---- Nav ---- */
+      .sidebar-nav {
+        flex: 1;
+        padding: var(--space-sm) 0;
+        overflow-y: auto;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 20px;
+        margin: 2px 8px;
+        border-radius: var(--radius-md);
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-md);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        position: relative;
+        text-decoration: none;
+      }
+
+      .nav-item:hover {
+        color: var(--color-text-primary);
+        background: rgba(0, 229, 255, 0.06);
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.08), inset 0 0 15px rgba(0, 229, 255, 0.03);
+      }
+
+      .nav-item.active {
+        color: var(--color-primary);
+        background: linear-gradient(90deg, rgba(0, 229, 255, 0.15), rgba(0, 229, 255, 0.05));
+        box-shadow: 0 0 20px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(0, 229, 255, 0.05);
+      }
+
+      .nav-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 6px; bottom: 6px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--color-primary);
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.8), 0 0 16px rgba(0, 229, 255, 0.4);
+        animation: breathe 3s ease-in-out infinite;
+      }
+
+      .nav-icon {
+        font-size: 16px;
+        width: 22px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      /* ---- Header ---- */
+      .top-header {
+        position: fixed;
+        left: var(--sidebar-width);
+        right: 0; top: 0;
+        height: var(--header-height);
+        background: rgba(8, 12, 22, 0.75);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border-bottom: 1px solid var(--color-border-glass);
+        z-index: var(--z-header);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 var(--space-xl);
+      }
+
+      .header-title {
+        font-family: var(--font-family-display);
+        font-size: var(--font-size-md);
+        color: var(--color-text-primary);
+        letter-spacing: var(--letter-spacing-wide);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-lg);
+      }
+
+      .notif-bell {
+        position: relative;
+        cursor: pointer;
+        color: var(--color-text-secondary);
+        transition: color var(--transition-fast);
+      }
+      .notif-bell:hover { color: var(--color-primary); }
+      .notif-badge {
+        position: absolute;
+        top: -3px; right: -4px;
+        width: 8px; height: 8px;
+        background: var(--color-danger);
+        border-radius: 50%;
+        box-shadow: 0 0 6px rgba(255,46,99,0.8);
+        animation: breathe 2s ease-in-out infinite;
+      }
+
+      .role-tag {
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-secondary);
+        border: 1px solid rgba(255, 184, 0, 0.3);
+        background: rgba(255, 184, 0, 0.08);
+        box-shadow: 0 0 8px rgba(255,184,0,0.2);
+        animation: breathe 4s ease-in-out infinite;
+      }
+
+      .avatar-circle {
+        width: 34px; height: 34px;
+        border-radius: 50%;
+        border: 2px solid var(--color-primary);
+        box-shadow: 0 0 10px rgba(0,229,255,0.4);
+        background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,229,255,0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-primary);
+        font-family: var(--font-family-display);
+        font-size: 14px;
+        font-weight: var(--font-weight-bold);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+      }
+      .avatar-circle:hover {
+        box-shadow: 0 0 16px rgba(0,229,255,0.6), 0 0 32px rgba(0,229,255,0.2);
+      }
+
+      /* ---- Main Content ---- */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding-top: var(--header-height);
+        min-height: 100vh;
+      }
+
+      .content-inner {
+        padding: var(--space-xl);
+      }
+
+      /* ---- KPI Cards ---- */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+      }
+
+      .kpi-card {
+        position: relative;
+        padding: var(--space-lg);
+        overflow: hidden;
+        transition: all var(--transition-normal);
+        cursor: default;
+      }
+
+      .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-float);
+      }
+
+      .kpi-icon {
+        position: absolute;
+        right: var(--space-md);
+        top: var(--space-md);
+        font-size: 32px;
+        opacity: 0.15;
+      }
+
+      .kpi-label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-tertiary);
+        letter-spacing: var(--letter-spacing-wide);
+        margin-bottom: var(--space-sm);
+      }
+
+      .kpi-value {
+        font-family: var(--font-family-mono);
+        font-size: var(--font-size-3xl);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-tight);
+      }
+
+      .kpi-value.neon-blue {
+        color: var(--color-primary);
+        text-shadow: 0 0 12px rgba(0,229,255,0.6), 0 0 24px rgba(0,229,255,0.3);
+      }
+
+      .kpi-value.neon-gold {
+        color: var(--color-secondary);
+        text-shadow: 0 0 12px rgba(255,184,0,0.6), 0 0 24px rgba(255,184,0,0.3);
+      }
+
+      .kpi-value.neon-orange {
+        color: var(--color-warning);
+        text-shadow: 0 0 12px rgba(255,138,0,0.6), 0 0 24px rgba(255,138,0,0.3);
+        animation: pulse-orange 2s ease-in-out infinite;
+      }
+
+      .kpi-value.neon-green {
+        color: var(--color-success);
+        text-shadow: 0 0 12px rgba(0,255,148,0.6), 0 0 24px rgba(0,255,148,0.3);
+        animation: pulse-green 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse-orange {
+        0%, 100% { text-shadow: 0 0 8px rgba(255,138,0,0.4), 0 0 16px rgba(255,138,0,0.2); }
+        50% { text-shadow: 0 0 16px rgba(255,138,0,0.8), 0 0 32px rgba(255,138,0,0.4); }
+      }
+
+      @keyframes pulse-green {
+        0%, 100% { text-shadow: 0 0 8px rgba(0,255,148,0.4), 0 0 16px rgba(0,255,148,0.2); }
+        50% { text-shadow: 0 0 16px rgba(0,255,148,0.8), 0 0 32px rgba(0,255,148,0.4); }
+      }
+
+      .kpi-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 2px;
+      }
+
+      .kpi-card.kpi-orange::after { background: linear-gradient(90deg, transparent, var(--color-warning-dim), transparent); }
+      .kpi-card.kpi-blue::after { background: linear-gradient(90deg, transparent, var(--color-primary-dim), transparent); }
+      .kpi-card.kpi-green::after { background: linear-gradient(90deg, transparent, var(--color-success-dim), transparent); }
+      .kpi-card.kpi-gold::after { background: linear-gradient(90deg, transparent, var(--color-secondary-dim), transparent); }
+
+      /* ---- Section Title ---- */
+      .section-title {
+        font-family: var(--font-family-display);
+        font-size: var(--font-size-lg);
+        color: var(--color-primary);
+        letter-spacing: var(--letter-spacing-wide);
+        margin-bottom: var(--space-lg);
+        padding-bottom: var(--space-sm);
+        border-bottom: 1px solid var(--color-border-subtle);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .section-title .title-icon {
+        font-size: 18px;
+        opacity: 0.7;
+      }
+
+      /* ---- Work Order Card Grid ---- */
+      .workorder-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-lg);
+      }
+
+      /* ---- Work Order Card ---- */
+      .workorder-card {
+        position: relative;
+        padding: 0;
+        overflow: hidden;
+        transition: all var(--transition-normal);
+        cursor: default;
+        display: flex;
+      }
+
+      .workorder-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-float);
+      }
+
+      /* Left colored priority border */
+      .workorder-card .priority-border {
+        width: 5px;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .workorder-card.priority-urgent .priority-border {
+        background: var(--color-danger);
+        box-shadow: 0 0 12px rgba(255,46,99,0.6), 0 0 24px rgba(255,46,99,0.3);
+        animation: urgent-pulse 1.5s ease-in-out infinite;
+      }
+
+      .workorder-card.priority-high .priority-border {
+        background: var(--color-warning);
+        box-shadow: 0 0 10px rgba(255,138,0,0.4), 0 0 20px rgba(255,138,0,0.2);
+      }
+
+      .workorder-card.priority-medium .priority-border {
+        background: var(--color-primary);
+        box-shadow: 0 0 10px rgba(0,229,255,0.4), 0 0 20px rgba(0,229,255,0.2);
+      }
+
+      .workorder-card.priority-low .priority-border {
+        background: rgba(232, 236, 244, 0.25);
+      }
+
+      @keyframes urgent-pulse {
+        0%, 100% {
+          background: var(--color-danger);
+          box-shadow: 0 0 8px rgba(255,46,99,0.4), 0 0 16px rgba(255,46,99,0.2);
+        }
+        50% {
+          background: #FF5A7E;
+          box-shadow: 0 0 20px rgba(255,46,99,0.8), 0 0 40px rgba(255,46,99,0.4), 0 0 60px rgba(255,46,99,0.2);
+        }
+      }
+
+      .card-body {
+        flex: 1;
+        padding: var(--space-lg);
+        display: flex;
+        gap: var(--space-lg);
+        min-width: 0;
+      }
+
+      /* Card main info */
+      .card-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      /* Card top row: ID + badges */
+      .card-top-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
+      }
+
+      .order-id {
+        font-family: var(--font-family-mono);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-tertiary);
+        letter-spacing: var(--letter-spacing-wide);
+      }
+
+      /* Priority badges */
+      .priority-badge {
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        padding: 2px 10px;
+        border-radius: var(--radius-full);
+        letter-spacing: var(--letter-spacing-wide);
+      }
+
+      .priority-badge.urgent {
+        background: var(--color-danger-faint);
+        border: 1px solid rgba(255,46,99,0.4);
+        color: var(--color-danger);
+        text-shadow: 0 0 6px rgba(255,46,99,0.4);
+        animation: badge-pulse-red 1.5s ease-in-out infinite;
+      }
+
+      .priority-badge.high {
+        background: var(--color-warning-faint);
+        border: 1px solid rgba(255,138,0,0.4);
+        color: var(--color-warning);
+        text-shadow: 0 0 6px rgba(255,138,0,0.4);
+      }
+
+      .priority-badge.medium {
+        background: var(--color-primary-faint);
+        border: 1px solid rgba(0,229,255,0.4);
+        color: var(--color-primary);
+        text-shadow: 0 0 6px rgba(0,229,255,0.4);
+      }
+
+      .priority-badge.low {
+        background: rgba(232,236,244,0.08);
+        border: 1px solid rgba(232,236,244,0.15);
+        color: var(--color-text-tertiary);
+      }
+
+      @keyframes badge-pulse-red {
+        0%, 100% { box-shadow: 0 0 4px rgba(255,46,99,0.3); }
+        50% { box-shadow: 0 0 12px rgba(255,46,99,0.6), 0 0 24px rgba(255,46,99,0.3); }
+      }
+
+      /* Status badges */
+      .status-badge {
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-medium);
+        padding: 2px 10px;
+        border-radius: var(--radius-full);
+        letter-spacing: var(--letter-spacing-normal);
+      }
+
+      .status-pending {
+        background: var(--color-warning-faint);
+        border: 1px solid rgba(255,138,0,0.3);
+        color: var(--color-warning);
+        text-shadow: 0 0 6px rgba(255,138,0,0.4);
+      }
+
+      .status-progress {
+        background: var(--color-primary-faint);
+        border: 1px solid rgba(0,229,255,0.3);
+        color: var(--color-primary);
+        text-shadow: 0 0 6px rgba(0,229,255,0.4);
+      }
+
+      .status-completed {
+        background: var(--color-success-faint);
+        border: 1px solid rgba(0,255,148,0.3);
+        color: var(--color-success);
+        text-shadow: 0 0 6px rgba(0,255,148,0.4);
+      }
+
+      /* Card title */
+      .card-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary);
+        line-height: var(--line-height-tight);
+      }
+
+      /* Card meta rows */
+      .card-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .meta-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+      }
+
+      .meta-label {
+        color: var(--color-text-tertiary);
+        flex-shrink: 0;
+      }
+
+      .meta-value {
+        color: var(--color-text-secondary);
+      }
+
+      /* Card bottom row */
+      .card-bottom {
+        display: flex;
+        align-items: center;
+        gap: var(--space-lg);
+        padding-top: var(--space-sm);
+        border-top: 1px solid var(--color-border-subtle);
+        margin-top: auto;
+      }
+
+      .bottom-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+      }
+
+      .bottom-item .bi-icon {
+        opacity: 0.5;
+      }
+
+      .bottom-item .bi-value {
+        color: var(--color-text-secondary);
+        font-family: var(--font-family-mono);
+      }
+
+      /* ---- Vertical Progress Timeline ---- */
+      .progress-timeline {
+        width: 60px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        padding: 8px 0;
+      }
+
+      .timeline-track {
+        position: absolute;
+        top: 20px;
+        bottom: 20px;
+        width: 4px;
+        border-radius: 2px;
+        background: rgba(232,236,244,0.08);
+        overflow: hidden;
+      }
+
+      .timeline-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-radius: 2px;
+        transition: height 0.6s ease;
+      }
+
+      /* Liquid flowing animation for progress fill */
+      .timeline-fill.liquid {
+        background: linear-gradient(180deg,
+          rgba(0, 229, 255, 0.4) 0%,
+          rgba(0, 229, 255, 0.9) 40%,
+          rgba(0, 229, 255, 1) 60%,
+          rgba(0, 229, 255, 0.7) 80%,
+          rgba(0, 229, 255, 0.4) 100%
+        );
+        background-size: 100% 200%;
+        animation: liquid-flow-down 2s ease-in-out infinite;
+      }
+
+      .timeline-fill.liquid-orange {
+        background: linear-gradient(180deg,
+          rgba(255, 138, 0, 0.4) 0%,
+          rgba(255, 138, 0, 0.9) 40%,
+          rgba(255, 138, 0, 1) 60%,
+          rgba(255, 138, 0, 0.7) 80%,
+          rgba(255, 138, 0, 0.4) 100%
+        );
+        background-size: 100% 200%;
+        animation: liquid-flow-down 2s ease-in-out infinite;
+      }
+
+      .timeline-fill.liquid-red {
+        background: linear-gradient(180deg,
+          rgba(255, 46, 99, 0.4) 0%,
+          rgba(255, 46, 99, 0.9) 40%,
+          rgba(255, 46, 99, 1) 60%,
+          rgba(255, 46, 99, 0.7) 80%,
+          rgba(255, 46, 99, 0.4) 100%
+        );
+        background-size: 100% 200%;
+        animation: liquid-flow-down 2s ease-in-out infinite;
+      }
+
+      .timeline-fill.liquid-green {
+        background: linear-gradient(180deg,
+          rgba(0, 255, 148, 0.4) 0%,
+          rgba(0, 255, 148, 0.9) 40%,
+          rgba(0, 255, 148, 1) 60%,
+          rgba(0, 255, 148, 0.7) 80%,
+          rgba(0, 255, 148, 0.4) 100%
+        );
+        background-size: 100% 200%;
+        animation: liquid-flow-down 2s ease-in-out infinite;
+      }
+
+      @keyframes liquid-flow-down {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 0% 100%; }
+        100% { background-position: 0% 0%; }
+      }
+
+      /* Wave effect at liquid surface */
+      .timeline-fill::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -1px;
+        right: -1px;
+        height: 6px;
+        border-radius: 50%;
+        animation: liquid-wave-surface 1.5s ease-in-out infinite;
+      }
+
+      .timeline-fill.liquid::after {
+        background: rgba(0, 229, 255, 0.8);
+        box-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
+      }
+
+      .timeline-fill.liquid-orange::after {
+        background: rgba(255, 138, 0, 0.8);
+        box-shadow: 0 0 6px rgba(255, 138, 0, 0.6);
+      }
+
+      .timeline-fill.liquid-red::after {
+        background: rgba(255, 46, 99, 0.8);
+        box-shadow: 0 0 6px rgba(255, 46, 99, 0.6);
+      }
+
+      .timeline-fill.liquid-green::after {
+        background: rgba(0, 255, 148, 0.8);
+        box-shadow: 0 0 6px rgba(0, 255, 148, 0.6);
+      }
+
+      @keyframes liquid-wave-surface {
+        0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.8; }
+        25% { transform: scaleY(1.4) scaleX(0.85); opacity: 1; }
+        50% { transform: scaleY(0.8) scaleX(1.1); opacity: 0.6; }
+        75% { transform: scaleY(1.2) scaleX(0.9); opacity: 0.9; }
+      }
+
+      /* Timeline step nodes */
+      .timeline-node {
+        position: relative;
+        z-index: 2;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid rgba(232,236,244,0.15);
+        background: var(--color-bg-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all var(--transition-normal);
+      }
+
+      .timeline-node.completed {
+        border-color: var(--color-primary);
+        background: var(--color-primary);
+        box-shadow: 0 0 8px rgba(0,229,255,0.6);
+      }
+
+      .timeline-node.completed-orange {
+        border-color: var(--color-warning);
+        background: var(--color-warning);
+        box-shadow: 0 0 8px rgba(255,138,0,0.6);
+      }
+
+      .timeline-node.completed-red {
+        border-color: var(--color-danger);
+        background: var(--color-danger);
+        box-shadow: 0 0 8px rgba(255,46,99,0.6);
+      }
+
+      .timeline-node.completed-green {
+        border-color: var(--color-success);
+        background: var(--color-success);
+        box-shadow: 0 0 8px rgba(0,255,148,0.6);
+      }
+
+      .timeline-node.active {
+        border-color: var(--color-primary);
+        background: var(--color-bg-primary);
+        box-shadow: 0 0 10px rgba(0,229,255,0.6), 0 0 20px rgba(0,229,255,0.3);
+        animation: node-glow 2s ease-in-out infinite;
+      }
+
+      .timeline-node.active-orange {
+        border-color: var(--color-warning);
+        background: var(--color-bg-primary);
+        box-shadow: 0 0 10px rgba(255,138,0,0.6), 0 0 20px rgba(255,138,0,0.3);
+        animation: node-glow-orange 2s ease-in-out infinite;
+      }
+
+      .timeline-node.active-red {
+        border-color: var(--color-danger);
+        background: var(--color-bg-primary);
+        box-shadow: 0 0 10px rgba(255,46,99,0.6), 0 0 20px rgba(255,46,99,0.3);
+        animation: node-glow-red 1.5s ease-in-out infinite;
+      }
+
+      .timeline-node.active-green {
+        border-color: var(--color-success);
+        background: var(--color-bg-primary);
+        box-shadow: 0 0 10px rgba(0,255,148,0.6), 0 0 20px rgba(0,255,148,0.3);
+        animation: node-glow-green 2s ease-in-out infinite;
+      }
+
+      @keyframes node-glow {
+        0%, 100% { box-shadow: 0 0 6px rgba(0,229,255,0.4); }
+        50% { box-shadow: 0 0 14px rgba(0,229,255,0.8), 0 0 28px rgba(0,229,255,0.4); }
+      }
+      @keyframes node-glow-orange {
+        0%, 100% { box-shadow: 0 0 6px rgba(255,138,0,0.4); }
+        50% { box-shadow: 0 0 14px rgba(255,138,0,0.8), 0 0 28px rgba(255,138,0,0.4); }
+      }
+      @keyframes node-glow-red {
+        0%, 100% { box-shadow: 0 0 6px rgba(255,46,99,0.4); }
+        50% { box-shadow: 0 0 14px rgba(255,46,99,0.8), 0 0 28px rgba(255,46,99,0.4); }
+      }
+      @keyframes node-glow-green {
+        0%, 100% { box-shadow: 0 0 6px rgba(0,255,148,0.4); }
+        50% { box-shadow: 0 0 14px rgba(0,255,148,0.8), 0 0 28px rgba(0,255,148,0.4); }
+      }
+
+      .timeline-node .node-inner {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: transparent;
+      }
+
+      .timeline-node.active .node-inner { background: var(--color-primary); box-shadow: 0 0 4px rgba(0,229,255,0.8); }
+      .timeline-node.active-orange .node-inner { background: var(--color-warning); box-shadow: 0 0 4px rgba(255,138,0,0.8); }
+      .timeline-node.active-red .node-inner { background: var(--color-danger); box-shadow: 0 0 4px rgba(255,46,99,0.8); }
+      .timeline-node.active-green .node-inner { background: var(--color-success); box-shadow: 0 0 4px rgba(0,255,148,0.8); }
+
+      .timeline-steps {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        position: relative;
+        z-index: 2;
+      }
+
+      .timeline-label {
+        font-size: 9px;
+        color: var(--color-text-tertiary);
+        text-align: center;
+        white-space: nowrap;
+        margin-top: 3px;
+        letter-spacing: 0.02em;
+      }
+
+      .timeline-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+    </style>
+</body>
+</html>
