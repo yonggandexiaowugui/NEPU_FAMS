@@ -1,7 +1,6 @@
 package xyz.wolegelei.nepu_fams.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -16,12 +15,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(Paths.get(System.getProperty("user.dir"), "uploads").toUri().toString());
-        registry.addResourceHandler("/assets/**")
-                .addResourceLocations(Paths.get(System.getProperty("user.dir"), "frontend", "dist", "assets").toUri().toString())
-                .setCacheControl(CacheControl.noStore());
-        registry.addResourceHandler("/vite.svg")
-                .addResourceLocations(Paths.get(System.getProperty("user.dir"), "frontend", "dist").toUri().toString())
-                .setCacheControl(CacheControl.noStore());
     }
 
     @Override
