@@ -61,6 +61,9 @@ public class RepairOrderServiceImpl implements RepairOrderService {
         if (AssetStatus.SCRAPPED.getCode().equals(asset.getStatus())) {
             throw new BusinessException("已报废的资产不能报修");
         }
+        if (currentUser.getCollegeId() == null || !asset.getCollegeId().equals(currentUser.getCollegeId())) {
+            throw new BusinessException("只能报修本学院资产");
+        }
 
         LambdaQueryWrapper<RepairOrder> existWrapper = new LambdaQueryWrapper<>();
         existWrapper.eq(RepairOrder::getAssetId, dto.getAssetId());
@@ -75,8 +78,11 @@ public class RepairOrderServiceImpl implements RepairOrderService {
         order.setUserId(currentUserId);
         order.setCollegeId(currentUser.getCollegeId());
         order.setFaultDescription(dto.getFaultDescription());
+        order.setRemark(dto.getRemark());
+        order.setAttachmentUrls(dto.getAttachmentUrls());
         order.setStatus(RepairStatus.PENDING.getCode());
-        order.setPriority(RepairPriority.NORMAL.getCode());
+        order.setPriority(normalizePriority(dto.getPriority()));
+        order.setIsDeleted(0);
 
         repairOrderMapper.insert(order);
 
@@ -164,7 +170,7 @@ public class RepairOrderServiceImpl implements RepairOrderService {
         }
 
         order.setAssigneeId(dto.getAssigneeId());
-        order.setPriority(dto.getPriority() != null ? dto.getPriority() : RepairPriority.NORMAL.getCode());
+        order.setPriority(normalizePriority(dto.getPriority()));
         order.setStatus(RepairStatus.IN_PROGRESS.getCode());
         repairOrderMapper.updateById(order);
     }
@@ -277,7 +283,7 @@ public class RepairOrderServiceImpl implements RepairOrderService {
             wrapper.eq(RepairOrder::getCollegeId, dto.getCollegeId());
         }
         if (StringUtils.hasText(dto.getPriority())) {
-            wrapper.eq(RepairOrder::getPriority, dto.getPriority());
+            wrapper.eq(RepairOrder::getPriority, normalizePriority(dto.getPriority()));
         }
         if (StringUtils.hasText(dto.getAssetName())) {
             List<Asset> assets = assetMapper.selectList(
@@ -325,6 +331,7 @@ public class RepairOrderServiceImpl implements RepairOrderService {
         SysUser user = sysUserMapper.selectById(order.getUserId());
         if (user != null) {
             vo.setUserName(user.getRealName());
+            vo.setReporterName(user.getRealName());
         }
 
         if (order.getCollegeId() != null) {
@@ -338,9 +345,22 @@ public class RepairOrderServiceImpl implements RepairOrderService {
             SysUser assignee = sysUserMapper.selectById(order.getAssigneeId());
             if (assignee != null) {
                 vo.setAssigneeName(assignee.getRealName());
+                vo.setRepairerName(assignee.getRealName());
             }
         }
 
         return vo;
+    }
+
+    private String normalizePriority(String priority) {
+        if (!StringUtils.hasText(priority) || "MEDIUM".equalsIgnoreCase(priority)) {
+            return RepairPriority.NORMAL.getCode();
+        }
+        for (RepairPriority item : RepairPriority.values()) {
+            if (item.getCode().equalsIgnoreCase(priority)) {
+                return item.getCode();
+            }
+        }
+        return RepairPriority.NORMAL.getCode();
     }
 }

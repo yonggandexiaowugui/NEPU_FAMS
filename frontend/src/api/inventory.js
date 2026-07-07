@@ -83,3 +83,27 @@ export function getInventoryDiffList(params) {
     params
   })
 }
+
+export function analyzeInventoryDiff(params) {
+  return request({
+    url: '/inventory/diff/analyze',
+    method: 'get',
+    params
+  })
+}
+
+export function getInventoryAiAnalysis(params) {
+  return request({
+    url: '/inventory/diff/ai-analysis',
+    method: 'get',
+    params
+  })
+}
+
+export function confirmInventoryDiff(taskId, assetIds) {
+  return request({
+    url: `/inventory/diff/confirm/${taskId}`,
+    method: 'post',
+    data: assetIds
+  })
+}

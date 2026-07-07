@@ -6,6 +6,7 @@
           <span>盘点录入</span>
           <div>
             <el-button @click="handleViewDiff" :disabled="!queryForm.taskId">查看差异</el-button>
+            <el-button type="success" @click="handleAnalyzeDiff" :disabled="!queryForm.taskId">智能分析</el-button>
             <el-button type="primary" @click="handleBatchSave" :disabled="!queryForm.taskId || !hasChanges">保存盘点</el-button>
           </div>
         </div>
@@ -148,7 +149,7 @@
             />
           </template>
         </el-table-column>
-        <el-table-column prop="checkTime" label="盘点时间" width="170" />
+        <el-table-column prop="createTime" label="盘点时间" width="170" />
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="handleQuickCheck(row)">
@@ -196,7 +197,21 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="diffDialogVisible" title="盘点差异清单" width="800px">
+    <el-dialog v-model="diffDialogVisible" title="盘点差异与智能分析" width="960px">
+      <el-alert
+        v-if="analysisData"
+        type="success"
+        show-icon
+        :closable="false"
+        class="analysis-alert"
+      >
+        <template #title>智能分析摘要</template>
+        <div class="analysis-content">
+          <p>{{ analysisData.summary }}</p>
+          <p><strong>处理建议：</strong>{{ analysisData.suggestion }}</p>
+          <p>账实一致 {{ analysisData.matchCount || 0 }} 条，盘盈 {{ analysisData.profitCount || 0 }} 条，盘亏 {{ analysisData.lossCount || 0 }} 条。</p>
+        </div>
+      </el-alert>
       <el-table :data="diffList" border stripe v-loading="diffLoading" max-height="500">
         <el-table-column prop="assetNo" label="资产编号" width="140" />
         <el-table-column prop="assetName" label="资产名称" min-width="150" show-overflow-tooltip />
@@ -211,6 +226,15 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="风险" width="90" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.riskLevel === 'HIGH' ? 'danger' : row.riskLevel === 'MEDIUM' ? 'warning' : 'success'" size="small">
+              {{ row.riskLevel === 'HIGH' ? '高' : row.riskLevel === 'MEDIUM' ? '中' : '低' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="analysis" label="智能说明" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="suggestion" label="处理建议" min-width="220" show-overflow-tooltip />
         <el-table-column prop="remark" label="备注" show-overflow-tooltip />
       </el-table>
       <el-empty v-if="diffList.length === 0 && !diffLoading" description="暂无差异数据" />
@@ -232,7 +256,9 @@ import {
   submitInventoryRecord,
   batchSubmitInventoryRecord,
   getInventoryTaskList,
-  getInventoryDiffList
+  getInventoryDiffList,
+  analyzeInventoryDiff,
+  confirmInventoryDiff
 } from '@/api/inventory'
 
 const loading = ref(false)
@@ -245,6 +271,7 @@ const stats = ref(null)
 const checkDialogVisible = ref(false)
 const diffDialogVisible = ref(false)
 const diffList = ref([])
+const analysisData = ref(null)
 const selectedRows = ref([])
 const hasChanges = ref(false)
 
@@ -276,17 +303,31 @@ async function loadTasks() {
   }
 }
 
+let fullRecordList = []
+
 async function loadData() {
   if (!queryForm.taskId) return
   loading.value = true
   try {
-    const res = await getInventoryRecordList(queryForm)
-    const list = res.records || res.list || []
-    tableData.value = list.map(item => ({
+    const res = await getInventoryRecordList({ taskId: queryForm.taskId })
+    let list = Array.isArray(res) ? res : (res.records || res.list || [])
+    fullRecordList = list.map(item => ({
       ...item,
       actualCount: item.actualCount !== undefined ? item.actualCount : (item.isChecked ? 1 : 0)
     }))
-    total.value = res.total || 0
+    if (queryForm.assetNo) {
+      list = list.filter(item => item.assetNo && item.assetNo.includes(queryForm.assetNo))
+    }
+    if (queryForm.isChecked !== null) {
+      list = list.filter(item => Boolean(item.isChecked) === Boolean(queryForm.isChecked))
+    }
+    total.value = list.length
+    const start = (queryForm.pageNum - 1) * queryForm.pageSize
+    const end = start + queryForm.pageSize
+    tableData.value = list.slice(start, end).map(item => ({
+      ...item,
+      actualCount: item.actualCount !== undefined ? item.actualCount : (item.isChecked ? 1 : 0)
+    }))
     calculateStats()
   } catch (error) {
     console.error('Load inventory record list error:', error)
@@ -296,7 +337,7 @@ async function loadData() {
 }
 
 function calculateStats() {
-  const list = tableData.value
+  const list = fullRecordList.length > 0 ? fullRecordList : tableData.value
   const totalCount = list.length
   const checkedCount = list.filter(item => item.isChecked).length
   const uncheckedCount = totalCount - checkedCount
@@ -365,6 +406,7 @@ async function handleSubmitCheck() {
     await submitInventoryRecord({
       taskId: queryForm.taskId,
       assetId: checkForm.assetId,
+      actualQuantity: checkForm.actualCount,
       actualCount: checkForm.actualCount,
       isChecked: checkForm.isChecked,
       remark: checkForm.remark
@@ -395,6 +437,7 @@ async function handleBatchSave() {
     try {
       const records = changedRows.map(row => ({
         assetId: row.assetId,
+        actualQuantity: row.actualCount,
         actualCount: row.actualCount,
         isChecked: row.isChecked,
         remark: row.remark
@@ -421,6 +464,7 @@ async function handleViewDiff() {
   }
   diffLoading.value = true
   diffDialogVisible.value = true
+  analysisData.value = null
   try {
     const res = await getInventoryDiffList({ taskId: queryForm.taskId })
     diffList.value = res.records || res.list || res || []
@@ -431,12 +475,34 @@ async function handleViewDiff() {
   }
 }
 
+async function handleAnalyzeDiff() {
+  if (!queryForm.taskId) {
+    ElMessage.warning('请先选择盘点任务')
+    return
+  }
+  diffLoading.value = true
+  diffDialogVisible.value = true
+  try {
+    const res = await analyzeInventoryDiff({ taskId: queryForm.taskId })
+    analysisData.value = res
+    diffList.value = res.differences || []
+  } catch (error) {
+    console.error('Analyze diff error:', error)
+  } finally {
+    diffLoading.value = false
+  }
+}
+
 function handleConfirmDiff() {
   ElMessageBox.confirm('确定要确认这些差异吗？确认后将无法修改。', '确认差异', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(() => {
+  }).then(async () => {
+    const assetIds = diffList.value
+      .filter(item => item.diffType !== 'MATCH')
+      .map(item => item.assetId)
+    await confirmInventoryDiff(queryForm.taskId, assetIds)
     ElMessage.success('差异已确认')
     diffDialogVisible.value = false
     loadData()

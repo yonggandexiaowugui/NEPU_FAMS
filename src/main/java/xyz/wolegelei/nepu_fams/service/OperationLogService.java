@@ -15,5 +15,9 @@ public interface OperationLogService {
 
     void add(OperationLog operationLog);
 
+    void delete(Long id);
+
+    void clear();
+
     List<OperationLogVO> export(OperationLogQueryDTO dto);
 }

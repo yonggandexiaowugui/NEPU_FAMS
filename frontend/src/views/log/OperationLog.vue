@@ -13,10 +13,10 @@
       
       <el-form :inline="true" :model="queryForm" class="query-form">
         <el-form-item label="操作人">
-          <el-input v-model="queryForm.operator" placeholder="请输入操作人" clearable style="width: 150px" />
+          <el-input v-model="queryForm.username" placeholder="请输入操作人" clearable style="width: 150px" />
         </el-form-item>
         <el-form-item label="操作类型">
-          <el-select v-model="queryForm.operationType" placeholder="全部" clearable style="width: 130px">
+          <el-select v-model="queryForm.type" placeholder="全部" clearable style="width: 130px">
             <el-option label="新增" value="ADD" />
             <el-option label="修改" value="UPDATE" />
             <el-option label="删除" value="DELETE" />
@@ -45,20 +45,14 @@
 
       <el-table :data="tableData" border stripe v-loading="loading">
         <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="operationType" label="操作类型" width="100">
+        <el-table-column prop="type" label="操作类型" width="100">
           <template #default="{ row }">
-            <el-tag :type="typeTagType(row.operationType)" size="small">{{ typeText(row.operationType) }}</el-tag>
+            <el-tag :type="typeTagType(row.type)" size="small">{{ row.typeName || typeText(row.type) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="module" label="模块" width="120" />
-        <el-table-column prop="description" label="操作描述" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="operatorName" label="操作人" width="110" />
+        <el-table-column prop="operation" label="操作描述" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="username" label="操作人" width="110" />
         <el-table-column prop="ip" label="IP地址" width="130" />
-        <el-table-column prop="costTime" label="耗时(ms)" width="100" align="center">
-          <template #default="{ row }">
-            {{ row.costTime || '-' }}
-          </template>
-        </el-table-column>
         <el-table-column prop="createTime" label="操作时间" width="170" />
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
@@ -78,24 +72,16 @@
     <el-dialog v-model="detailVisible" title="日志详情" width="700px">
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="操作类型">
-          <el-tag :type="typeTagType(detailData.operationType)">{{ typeText(detailData.operationType) }}</el-tag>
+          <el-tag :type="typeTagType(detailData.type)">{{ detailData.typeName || typeText(detailData.type) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="模块">{{ detailData.module || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="操作人">{{ detailData.operatorName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="操作人">{{ detailData.username || '-' }}</el-descriptions-item>
         <el-descriptions-item label="IP地址">{{ detailData.ip || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="耗时">{{ detailData.costTime ? detailData.costTime + ' ms' : '-' }}</el-descriptions-item>
         <el-descriptions-item label="操作时间">{{ detailData.createTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="操作描述" :span="2">{{ detailData.description || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="操作描述" :span="2">{{ detailData.operation || '-' }}</el-descriptions-item>
         <el-descriptions-item label="请求方法" :span="2">{{ detailData.method || '-' }}</el-descriptions-item>
         <el-descriptions-item label="请求参数" :span="2">
           <div v-if="detailData.params" class="params-box">
             <pre>{{ detailData.params }}</pre>
-          </div>
-          <span v-else>-</span>
-        </el-descriptions-item>
-        <el-descriptions-item label="返回结果" :span="2">
-          <div v-if="detailData.result" class="params-box">
-            <pre>{{ detailData.result }}</pre>
           </div>
           <span v-else>-</span>
         </el-descriptions-item>
@@ -123,8 +109,8 @@ const detailData = ref(null)
 const queryForm = reactive({
   pageNum: 1,
   pageSize: 10,
-  operator: '',
-  operationType: '',
+  username: '',
+  type: '',
   dateRange: []
 })
 
@@ -159,8 +145,8 @@ async function loadData() {
   try {
     const params = { ...queryForm }
     if (params.dateRange && params.dateRange.length === 2) {
-      params.startTime = params.dateRange[0]
-      params.endTime = params.dateRange[1]
+      params.startTime = `${params.dateRange[0]}T00:00:00`
+      params.endTime = `${params.dateRange[1]}T23:59:59`
     }
     delete params.dateRange
     const res = await getOperationLogList(params)
@@ -179,8 +165,8 @@ function handleQuery() {
 }
 
 function handleReset() {
-  queryForm.operator = ''
-  queryForm.operationType = ''
+  queryForm.username = ''
+  queryForm.type = ''
   queryForm.dateRange = []
   handleQuery()
 }
@@ -222,8 +208,8 @@ async function handleExport() {
     delete params.pageNum
     delete params.pageSize
     if (params.dateRange && params.dateRange.length === 2) {
-      params.startTime = params.dateRange[0]
-      params.endTime = params.dateRange[1]
+      params.startTime = `${params.dateRange[0]}T00:00:00`
+      params.endTime = `${params.dateRange[1]}T23:59:59`
     }
     delete params.dateRange
     const res = await exportOperationLog(params)

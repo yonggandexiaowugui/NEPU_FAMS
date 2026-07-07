@@ -50,7 +50,7 @@ const appStore = useAppStore()
 const userStore = useUserStore()
 
 const collapsed = computed(() => appStore.sidebarCollapsed)
-const userName = computed(() => userStore.userInfo?.username || userStore.userInfo?.name || '')
+const userName = computed(() => userStore.userInfo?.realName || userStore.userInfo?.username || '')
 
 const breadcrumbs = computed(() => {
   const matched = route.matched.filter(item => item.meta && item.meta.title)
@@ -87,24 +87,30 @@ function handleCommand(command) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 24px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
 
 .toggle-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
   font-size: 18px;
   cursor: pointer;
-  color: rgba(232, 236, 244, 0.45);
-  transition: all 0.25s;
+  color: #64748b;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: #00E5FF;
-    text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+    color: #3157d5;
+    background: #f1f5ff;
   }
 }
 
@@ -114,16 +120,19 @@ function handleCommand(command) {
 }
 
 .user-info {
+  height: 40px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 0 14px;
-  height: 56px;
-  border-radius: 0;
-  transition: all 0.25s;
+  padding: 0 10px 0 6px;
+  border: 1px solid #e7ecf4;
+  border-radius: 999px;
+  background: #ffffff;
+  transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(0, 229, 255, 0.04);
+    border-color: #cbd6e6;
+    box-shadow: 0 8px 20px rgba(30, 41, 59, 0.08);
   }
 }
 
@@ -134,11 +143,12 @@ function handleCommand(command) {
 .user-name {
   margin-right: 6px;
   font-size: 13px;
-  color: rgba(232, 236, 244, 0.7);
+  font-weight: 600;
+  color: #334155;
 }
 
 .dropdown-icon {
   font-size: 12px;
-  color: rgba(232, 236, 244, 0.35);
+  color: #94a3b8;
 }
 </style>

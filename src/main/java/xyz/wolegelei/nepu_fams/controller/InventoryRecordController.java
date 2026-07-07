@@ -6,6 +6,7 @@ import xyz.wolegelei.nepu_fams.common.Result;
 import xyz.wolegelei.nepu_fams.dto.inventory.InventoryRecordBatchDTO;
 import xyz.wolegelei.nepu_fams.dto.inventory.InventoryRecordDTO;
 import xyz.wolegelei.nepu_fams.service.InventoryRecordService;
+import xyz.wolegelei.nepu_fams.vo.inventory.InventoryAnalysisVO;
 import xyz.wolegelei.nepu_fams.vo.inventory.InventoryDiffVO;
 import xyz.wolegelei.nepu_fams.vo.inventory.InventoryRecordVO;
 
@@ -40,6 +41,16 @@ public class InventoryRecordController {
     public Result<List<InventoryDiffVO>> diffList(@RequestParam Long taskId) {
         List<InventoryDiffVO> list = inventoryRecordService.getDiffList(taskId);
         return Result.success(list);
+    }
+
+    @GetMapping("/diff/analyze")
+    public Result<InventoryAnalysisVO> analyzeDiff(@RequestParam Long taskId) {
+        return Result.success(inventoryRecordService.analyzeDiff(taskId));
+    }
+
+    @GetMapping("/diff/ai-analysis")
+    public Result<String> aiAnalysis(@RequestParam Long taskId) {
+        return Result.success(inventoryRecordService.generateAiDiffAnalysis(taskId));
     }
 
     @PostMapping("/diff/confirm/{taskId}")

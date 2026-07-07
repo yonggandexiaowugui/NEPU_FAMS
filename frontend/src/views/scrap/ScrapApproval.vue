@@ -14,9 +14,9 @@
         <el-table-column prop="id" label="ID" width="70" />
         <el-table-column prop="assetNo" label="资产编号" width="140" />
         <el-table-column prop="assetName" label="资产名称" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="applyUserName" label="申请人" width="110" />
+        <el-table-column prop="proposerName" label="申请人" width="110" />
         <el-table-column prop="collegeName" label="所属学院" width="140" />
-        <el-table-column prop="scrapReason" label="报废原因" show-overflow-tooltip min-width="150" />
+        <el-table-column prop="reason" label="报废原因" show-overflow-tooltip min-width="150" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusText(row.status) }}</el-tag>
@@ -46,39 +46,18 @@
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.assetName || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="规格型号">{{ detailData.specification || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="购置日期">{{ detailData.purchaseDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="资产价值">{{ detailData.value ? detailData.value + ' 元' : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="已使用年限">{{ detailData.useYears || '-' }} 年</el-descriptions-item>
-        <el-descriptions-item label="申请人">{{ detailData.applyUserName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="申请人">{{ detailData.proposerName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="申请时间">{{ detailData.createTime || '-' }}</el-descriptions-item>
         <el-descriptions-item label="当前状态">
           <el-tag :type="statusTagType(detailData.status)">{{ statusText(detailData.status) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="所属学院">{{ detailData.collegeName || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="报废原因" :span="2">{{ detailData.scrapReason || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="审批人" v-if="detailData.approverName">{{ detailData.approverName }}</el-descriptions-item>
-        <el-descriptions-item label="审批时间" v-if="detailData.approveTime">{{ detailData.approveTime }}</el-descriptions-item>
-        <el-descriptions-item label="审批意见" :span="2" v-if="detailData.approveRemark">{{ detailData.approveRemark }}</el-descriptions-item>
+        <el-descriptions-item label="报废原因" :span="2">{{ detailData.reason || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="学院审批人" v-if="detailData.collegeApproverName">{{ detailData.collegeApproverName }}</el-descriptions-item>
+        <el-descriptions-item label="学院审批意见" v-if="detailData.collegeApprovalOpinion">{{ detailData.collegeApprovalOpinion }}</el-descriptions-item>
+        <el-descriptions-item label="校级审批人" v-if="detailData.superApproverName">{{ detailData.superApproverName }}</el-descriptions-item>
+        <el-descriptions-item label="校级审批意见" v-if="detailData.superApprovalOpinion">{{ detailData.superApprovalOpinion }}</el-descriptions-item>
       </el-descriptions>
-
-      <el-divider content-position="left" v-if="detailData && detailData.approvalRecords && detailData.approvalRecords.length > 0">审批记录</el-divider>
-      <el-timeline v-if="detailData && detailData.approvalRecords && detailData.approvalRecords.length > 0">
-        <el-timeline-item
-          v-for="(record, index) in detailData.approvalRecords"
-          :key="index"
-          :type="record.approved ? 'success' : 'danger'"
-          :timestamp="record.approveTime"
-        >
-          <h4 style="margin: 0 0 5px 0">
-            {{ record.approverName || '系统' }}
-            <el-tag size="small" :type="record.approved ? 'success' : 'danger'">
-              {{ record.approved ? '通过' : '驳回' }}
-            </el-tag>
-          </h4>
-          <p style="margin: 0; color: #606266; font-size: 13px">{{ record.remark || '无备注' }}</p>
-        </el-timeline-item>
-      </el-timeline>
 
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
@@ -135,12 +114,12 @@ const rejectRules = {
 }
 
 function statusText(status) {
-  const map = { PENDING: '待审批', APPROVED: '已通过', REJECTED: '已驳回', COMPLETED: '已完成' }
+  const map = { PENDING: '待审批', PENDING_COLLEGE: '待学院审批', PENDING_SUPER: '待校级审批', APPROVED: '已通过', REJECTED: '已驳回', COMPLETED: '已完成' }
   return map[status] || status
 }
 
 function statusTagType(status) {
-  const map = { PENDING: 'warning', APPROVED: 'success', REJECTED: 'danger', COMPLETED: 'info' }
+  const map = { PENDING: 'warning', PENDING_COLLEGE: 'warning', PENDING_SUPER: 'warning', APPROVED: 'success', REJECTED: 'danger', COMPLETED: 'info' }
   return map[status] || 'info'
 }
 
@@ -153,7 +132,12 @@ async function loadData() {
   loading.value = true
   try {
     const params = { ...queryForm }
-    params.status = activeTab.value === 'pending' ? 'PENDING' : ''
+    if (activeTab.value === 'approved') {
+      params.approved = true
+      delete params.status
+    } else {
+      delete params.status
+    }
     const res = await getScrapApprovalList(params)
     tableData.value = res.records || res.list || []
     total.value = res.total || 0
@@ -186,7 +170,7 @@ function handleApprove(row) {
     type: 'success'
   }).then(async () => {
     try {
-      await approveScrap(row.id, { remark: '同意报废' })
+      await approveScrap(row.id, { approvalOpinion: '同意报废' })
       ElMessage.success('已通过')
       detailVisible.value = false
       loadData()
@@ -208,7 +192,7 @@ async function submitReject() {
     if (valid) {
       submitLoading.value = true
       try {
-        await rejectScrap(currentRow.value.id, { remark: rejectForm.remark })
+        await rejectScrap(currentRow.value.id, { approvalOpinion: rejectForm.remark })
         ElMessage.success('已驳回')
         rejectVisible.value = false
         detailVisible.value = false

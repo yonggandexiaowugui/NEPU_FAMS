@@ -97,7 +97,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<CollegeStatsVO> result = new ArrayList<>();
 
         LambdaQueryWrapper<College> collegeWrapper = new LambdaQueryWrapper<>();
-        if (RoleConstants.COLLEGE_ADMIN.equals(currentUser.getRole())) {
+        if (RoleConstants.COLLEGE_ADMIN.equals(currentUser.getRole()) || RoleConstants.USER.equals(currentUser.getRole())) {
             collegeWrapper.eq(College::getId, currentUser.getCollegeId());
         }
         collegeWrapper.orderByAsc(College::getId);
@@ -155,16 +155,23 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Asset> assets = assetMapper.selectList(wrapper);
         int totalCount = assets.size();
 
-        Map<Long, Long> categoryCountMap = assets.stream()
-                .filter(a -> a.getCategoryId() != null)
-                .collect(Collectors.groupingBy(Asset::getCategoryId, Collectors.counting()));
+        LambdaQueryWrapper<AssetCategory> allCategoryWrapper = new LambdaQueryWrapper<>();
+        List<AssetCategory> allCategories = assetCategoryMapper.selectList(allCategoryWrapper);
+        Map<Long, AssetCategory> categoryMap = allCategories.stream()
+                .collect(Collectors.toMap(AssetCategory::getId, c -> c));
 
-        Map<Long, BigDecimal> categoryValueMap = assets.stream()
-                .filter(a -> a.getCategoryId() != null && a.getCurrentValue() != null)
-                .collect(Collectors.groupingBy(
-                        Asset::getCategoryId,
-                        Collectors.reducing(BigDecimal.ZERO, Asset::getCurrentValue, BigDecimal::add)
-                ));
+        Map<Long, Long> categoryCountMap = new HashMap<>();
+        Map<Long, BigDecimal> categoryValueMap = new HashMap<>();
+        for (Asset asset : assets) {
+            Long rootCategoryId = getRootCategoryId(asset.getCategoryId(), categoryMap);
+            if (rootCategoryId == null) {
+                continue;
+            }
+            categoryCountMap.merge(rootCategoryId, 1L, Long::sum);
+            categoryValueMap.merge(rootCategoryId,
+                    asset.getCurrentValue() != null ? asset.getCurrentValue() : BigDecimal.ZERO,
+                    BigDecimal::add);
+        }
 
         LambdaQueryWrapper<AssetCategory> categoryWrapper = new LambdaQueryWrapper<>();
         categoryWrapper.eq(AssetCategory::getLevel, 1);
@@ -238,6 +245,16 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public InventoryStatsVO getInventoryStats(Long taskId) {
+        if (taskId == null) {
+            InventoryStatsVO vo = new InventoryStatsVO();
+            vo.setTotalCount(0);
+            vo.setCheckedCount(0);
+            vo.setProfitCount(0);
+            vo.setLossCount(0);
+            vo.setMatchCount(0);
+            return vo;
+        }
+
         InventoryTask task = inventoryTaskMapper.selectById(taskId);
         if (task == null) {
             throw new BusinessException(ResultCode.INVENTORY_NOT_FOUND);
@@ -327,13 +344,25 @@ public class StatisticsServiceImpl implements StatisticsService {
         LambdaQueryWrapper<Asset> wrapper = new LambdaQueryWrapper<>();
 
         String role = currentUser.getRole();
-        if (RoleConstants.COLLEGE_ADMIN.equals(role)) {
+        if (RoleConstants.COLLEGE_ADMIN.equals(role) || RoleConstants.USER.equals(role)) {
             wrapper.eq(Asset::getCollegeId, currentUser.getCollegeId());
-        } else if (RoleConstants.USER.equals(role)) {
-            wrapper.eq(Asset::getUserId, currentUser.getId());
         }
 
         return wrapper;
+    }
+
+    private Long getRootCategoryId(Long categoryId, Map<Long, AssetCategory> categoryMap) {
+        if (categoryId == null) {
+            return null;
+        }
+        AssetCategory category = categoryMap.get(categoryId);
+        if (category == null) {
+            return null;
+        }
+        if (category.getLevel() != null && category.getLevel() == 1) {
+            return category.getId();
+        }
+        return category.getParentId();
     }
 
     private void checkDataPermission(InventoryTask task, SysUser currentUser) {

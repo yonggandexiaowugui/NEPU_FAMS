@@ -19,6 +19,8 @@ public interface InventoryTaskService {
 
     void delete(Long id);
 
+    void start(Long id);
+
     void complete(Long id);
 
     void archive(Long id);

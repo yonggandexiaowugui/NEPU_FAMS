@@ -71,6 +71,7 @@ public class ScrapController {
 
     @PostMapping("/cancel/{id}")
     public Result<Void> cancel(@PathVariable Long id) {
+        scrapplicationService.delete(id);
         return Result.success();
     }
 

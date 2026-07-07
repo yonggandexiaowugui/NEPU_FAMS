@@ -20,6 +20,18 @@ public class InventoryRecordVO implements Serializable {
 
     private Integer actualQuantity;
 
+    private Integer actualCount;
+
+    private Boolean isChecked;
+
+    private Integer bookCount;
+
+    private String categoryName;
+
+    private String collegeName;
+
+    private String location;
+
     private String remark;
 
     private Long recorderId;

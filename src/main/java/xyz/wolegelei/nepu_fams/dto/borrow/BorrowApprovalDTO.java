@@ -8,5 +8,13 @@ public class BorrowApprovalDTO implements Serializable {
 
     private Long applicationId;
 
+    private Boolean approved;
+
     private String opinion;
+
+    private String remark;
+
+    public String getApprovalOpinion() {
+        return opinion != null ? opinion : remark;
+    }
 }

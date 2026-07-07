@@ -24,6 +24,21 @@ export function submitRepair(data) {
   })
 }
 
+export function uploadRepairFile(data) {
+  return request({
+    url: '/file/upload',
+    method: 'post',
+    data,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+export function uploadRepairAttachment(file) {
+  const data = new FormData()
+  data.append('file', file)
+  return uploadRepairFile(data)
+}
+
 export function getRepairDetail(id) {
   return request({
     url: `/repair/${id}`,

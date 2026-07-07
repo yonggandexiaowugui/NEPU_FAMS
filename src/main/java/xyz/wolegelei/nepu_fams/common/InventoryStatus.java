@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum InventoryStatus {
 
+    PENDING("PENDING", "待开始"),
     IN_PROGRESS("IN_PROGRESS", "进行中"),
     COMPLETED("COMPLETED", "已完成"),
     ARCHIVED("ARCHIVED", "已归档");

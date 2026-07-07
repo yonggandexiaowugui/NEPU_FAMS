@@ -114,12 +114,17 @@ public class InventoryTaskServiceImpl implements InventoryTaskService {
     @Override
     public void create(InventoryTaskCreateDTO dto) {
         checkAdminPermission();
+        SysUser currentUser = sysUserMapper.selectById(StpUtil.getLoginIdAsLong());
+        if (RoleConstants.COLLEGE_ADMIN.equals(currentUser.getRole()) && dto.getCollegeId() == null) {
+            dto.setCollegeId(currentUser.getCollegeId());
+        }
         checkDataPermissionForCollege(dto.getCollegeId());
 
         InventoryTask task = new InventoryTask();
         BeanUtils.copyProperties(dto, task);
-        task.setStatus(InventoryStatus.IN_PROGRESS.getCode());
+        task.setStatus(InventoryStatus.PENDING.getCode());
         task.setCreatorId(StpUtil.getLoginIdAsLong());
+        task.setIsDeleted(0);
 
         inventoryTaskMapper.insert(task);
     }
@@ -135,8 +140,8 @@ public class InventoryTaskServiceImpl implements InventoryTaskService {
 
         checkDataPermission(exist);
 
-        if (!InventoryStatus.IN_PROGRESS.getCode().equals(exist.getStatus())) {
-            throw new BusinessException("只有进行中的盘点任务可以编辑");
+        if (!InventoryStatus.PENDING.getCode().equals(exist.getStatus())) {
+            throw new BusinessException("只有待开始的盘点任务可以编辑");
         }
 
         InventoryTask task = new InventoryTask();
@@ -157,8 +162,8 @@ public class InventoryTaskServiceImpl implements InventoryTaskService {
 
         checkDataPermission(exist);
 
-        if (!InventoryStatus.IN_PROGRESS.getCode().equals(exist.getStatus())) {
-            throw new BusinessException("只有进行中的盘点任务可以删除");
+        if (!InventoryStatus.PENDING.getCode().equals(exist.getStatus())) {
+            throw new BusinessException("只有待开始的盘点任务可以删除");
         }
 
         inventoryTaskMapper.deleteById(id);
@@ -166,6 +171,25 @@ public class InventoryTaskServiceImpl implements InventoryTaskService {
         LambdaQueryWrapper<InventoryRecord> recordWrapper = new LambdaQueryWrapper<>();
         recordWrapper.eq(InventoryRecord::getTaskId, id);
         inventoryRecordMapper.delete(recordWrapper);
+    }
+
+    @Override
+    public void start(Long id) {
+        checkAdminPermission();
+
+        InventoryTask exist = inventoryTaskMapper.selectById(id);
+        if (exist == null) {
+            throw new BusinessException(ResultCode.INVENTORY_NOT_FOUND);
+        }
+
+        checkDataPermission(exist);
+
+        if (!InventoryStatus.PENDING.getCode().equals(exist.getStatus())) {
+            throw new BusinessException("只有待开始的盘点任务可以开始");
+        }
+
+        exist.setStatus(InventoryStatus.IN_PROGRESS.getCode());
+        inventoryTaskMapper.updateById(exist);
     }
 
     @Override

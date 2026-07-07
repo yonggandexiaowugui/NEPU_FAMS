@@ -28,7 +28,7 @@
       <el-table :data="tableData" border stripe v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="username" label="用户名" />
-        <el-table-column prop="name" label="姓名" />
+        <el-table-column prop="realName" label="姓名" />
         <el-table-column prop="email" label="邮箱" />
         <el-table-column prop="phone" label="电话" />
         <el-table-column prop="role" label="角色" width="120">
@@ -37,9 +37,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="260" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="warning" link @click="handleResetPassword(row)">重置密码</el-button>
             <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -58,8 +59,11 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" :disabled="isEdit" />
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name" />
+        <el-form-item label="姓名" prop="realName">
+          <el-input v-model="form.realName" />
+        </el-form-item>
+        <el-form-item v-if="!isEdit" label="密码" prop="password">
+          <el-input v-model="form.password" type="password" show-password />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" />
@@ -75,7 +79,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="学院" prop="collegeId">
-          <el-select v-model="form.collegeId" style="width: 100%">
+          <el-select v-model="form.collegeId" style="width: 100%" clearable>
             <el-option
               v-for="college in collegeList"
               :key="college.id"
@@ -90,6 +94,24 @@
         <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="passwordDialogVisible" title="重置密码" width="460px">
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="90px">
+        <el-form-item label="用户">
+          <el-input :model-value="passwordForm.username" disabled />
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input v-model="passwordForm.newPassword" type="password" show-password placeholder="请输入新密码" />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input v-model="passwordForm.confirmPassword" type="password" show-password placeholder="请再次输入新密码" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="passwordDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitResetPassword" :loading="passwordSubmitLoading">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -97,15 +119,18 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Pagination from '@/components/Pagination.vue'
-import { getUserList, addUser, updateUser, deleteUser } from '@/api/user'
+import { getUserList, addUser, updateUser, deleteUser, resetUserPassword } from '@/api/user'
 import { getAllColleges } from '@/api/college'
 
 const loading = ref(false)
 const submitLoading = ref(false)
+const passwordSubmitLoading = ref(false)
 const dialogVisible = ref(false)
+const passwordDialogVisible = ref(false)
 const dialogTitle = ref('')
 const isEdit = ref(false)
 const formRef = ref(null)
+const passwordFormRef = ref(null)
 const tableData = ref([])
 const total = ref(0)
 const collegeList = ref([])
@@ -120,17 +145,43 @@ const queryForm = reactive({
 const form = reactive({
   id: null,
   username: '',
-  name: '',
+  realName: '',
   email: '',
   phone: '',
   role: 'USER',
   collegeId: null
 })
 
+const passwordForm = reactive({
+  userId: null,
+  username: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+
+const validateConfirmPassword = (rule, value, callback) => {
+  if (value !== passwordForm.newPassword) {
+    callback(new Error('两次输入的密码不一致'))
+  } else {
+    callback()
+  }
+}
+
 const formRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+  realName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
   role: [{ required: true, message: '请选择角色', trigger: 'change' }]
+}
+
+const passwordRules = {
+  newPassword: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 6, max: 32, message: '密码长度必须在6-32位之间', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, message: '请确认新密码', trigger: 'blur' },
+    { validator: validateConfirmPassword, trigger: 'blur' }
+  ]
 }
 
 function roleText(role) {
@@ -186,7 +237,8 @@ function handleAdd() {
   Object.assign(form, {
     id: null,
     username: '',
-    name: '',
+    password: '',
+    realName: '',
     email: '',
     phone: '',
     role: 'USER',
@@ -209,7 +261,8 @@ async function handleSubmit() {
       submitLoading.value = true
       try {
         if (isEdit.value) {
-          await updateUser(form.id, form)
+          const { password, ...payload } = form
+          await updateUser(form.id, payload)
           ElMessage.success('修改成功')
         } else {
           await addUser(form)
@@ -222,6 +275,34 @@ async function handleSubmit() {
       } finally {
         submitLoading.value = false
       }
+    }
+  })
+}
+
+function handleResetPassword(row) {
+  Object.assign(passwordForm, {
+    userId: row.id,
+    username: row.realName ? `${row.username}（${row.realName}）` : row.username,
+    newPassword: '',
+    confirmPassword: ''
+  })
+  passwordDialogVisible.value = true
+  passwordFormRef.value?.clearValidate()
+}
+
+async function submitResetPassword() {
+  if (!passwordFormRef.value) return
+  await passwordFormRef.value.validate(async (valid) => {
+    if (!valid) return
+    passwordSubmitLoading.value = true
+    try {
+      await resetUserPassword(passwordForm.userId, { newPassword: passwordForm.newPassword })
+      ElMessage.success('密码重置成功')
+      passwordDialogVisible.value = false
+    } catch (error) {
+      console.error('Reset password error:', error)
+    } finally {
+      passwordSubmitLoading.value = false
     }
   })
 }

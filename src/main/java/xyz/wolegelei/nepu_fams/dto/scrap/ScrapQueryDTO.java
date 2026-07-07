@@ -15,4 +15,6 @@ public class ScrapQueryDTO extends PageQuery {
     private Long collegeId;
 
     private Long proposerId;
+
+    private Boolean approved;
 }

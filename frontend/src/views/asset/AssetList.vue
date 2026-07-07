@@ -30,9 +30,9 @@
           <el-select v-model="queryForm.status" placeholder="全部" clearable style="width: 110px">
             <el-option label="在用" value="IN_USE" />
             <el-option label="闲置" value="IDLE" />
-            <el-option label="借出" value="BORROWED" />
             <el-option label="维修中" value="REPAIRING" />
             <el-option label="已报废" value="SCRAPPED" />
+            <el-option label="盘亏" value="LOSS" />
           </el-select>
         </el-form-item>
         <el-form-item label="学院">
@@ -46,9 +46,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="价值区间">
-          <el-input-number v-model="queryForm.minValue" :min="0" placeholder="最小值" style="width: 100px" />
+          <el-input-number v-model="queryForm.minPrice" :min="0" placeholder="最小值" style="width: 100px" />
           <span style="margin: 0 5px">-</span>
-          <el-input-number v-model="queryForm.maxValue" :min="0" placeholder="最大值" style="width: 100px" />
+          <el-input-number v-model="queryForm.maxPrice" :min="0" placeholder="最大值" style="width: 100px" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
@@ -63,9 +63,9 @@
         <el-table-column prop="categoryName" label="分类" width="100" />
         <el-table-column prop="collegeName" label="所属学院" width="120" />
         <el-table-column prop="location" label="存放位置" width="120" show-overflow-tooltip />
-        <el-table-column prop="value" label="价值(元)" width="110">
+        <el-table-column prop="purchasePrice" label="价值(元)" width="110">
           <template #default="{ row }">
-            {{ formatMoney(row.value) }}
+            {{ formatMoney(row.purchasePrice) }}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="90">
@@ -95,8 +95,8 @@
       <el-form :model="form" :rules="formRules" ref="formRef" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="资产编号" prop="assetNo">
-              <el-input v-model="form.assetNo" />
+            <el-form-item label="资产编号">
+              <el-input v-model="form.assetNo" placeholder="新增时系统自动生成" disabled />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -133,8 +133,8 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="价值" prop="value">
-              <el-input-number v-model="form.value" :min="0" :precision="2" style="width: 100%" />
+            <el-form-item label="购置价格" prop="purchasePrice">
+              <el-input-number v-model="form.purchasePrice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -142,9 +142,9 @@
               <el-select v-model="form.status" style="width: 100%">
                 <el-option label="在用" value="IN_USE" />
                 <el-option label="闲置" value="IDLE" />
-                <el-option label="借出" value="BORROWED" />
                 <el-option label="维修中" value="REPAIRING" />
                 <el-option label="已报废" value="SCRAPPED" />
+                <el-option label="盘亏" value="LOSS" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -161,8 +161,8 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="描述" prop="description">
-          <el-input v-model="form.description" type="textarea" :rows="3" />
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" :rows="3" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -177,15 +177,14 @@
         <el-descriptions-item label="资产名称">{{ detailData.name }}</el-descriptions-item>
         <el-descriptions-item label="分类">{{ detailData.categoryName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="所属学院">{{ detailData.collegeName || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="价值">{{ formatMoney(detailData.value) }} 元</el-descriptions-item>
+        <el-descriptions-item label="购置价格">{{ formatMoney(detailData.purchasePrice) }} 元</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusTagType(detailData.status)">{{ statusText(detailData.status) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="存放位置">{{ detailData.location || '-' }}</el-descriptions-item>
         <el-descriptions-item label="购置日期">{{ detailData.purchaseDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ detailData.createTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间">{{ detailData.updateTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="描述" :span="2">{{ detailData.description || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="备注" :span="2">{{ detailData.remark || '-' }}</el-descriptions-item>
       </el-descriptions>
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
@@ -224,8 +223,8 @@ const queryForm = reactive({
   categoryId: null,
   status: '',
   collegeId: null,
-  minValue: null,
-  maxValue: null
+  minPrice: null,
+  maxPrice: null
 })
 
 const form = reactive({
@@ -234,27 +233,26 @@ const form = reactive({
   name: '',
   categoryId: null,
   collegeId: null,
-  value: 0,
+  purchasePrice: 0,
   status: 'IDLE',
   location: '',
   purchaseDate: '',
-  description: ''
+  remark: ''
 })
 
 const formRules = {
-  assetNo: [{ required: true, message: '请输入资产编号', trigger: 'blur' }],
   name: [{ required: true, message: '请输入资产名称', trigger: 'blur' }],
   categoryId: [{ required: true, message: '请选择资产分类', trigger: 'change' }],
   collegeId: [{ required: true, message: '请选择所属学院', trigger: 'change' }]
 }
 
 function statusText(status) {
-  const map = { IN_USE: '在用', IDLE: '闲置', BORROWED: '借出', REPAIRING: '维修中', SCRAPPED: '已报废' }
+  const map = { IN_USE: '在用', IDLE: '闲置', REPAIRING: '维修中', SCRAPPED: '已报废', LOSS: '盘亏' }
   return map[status] || status
 }
 
 function statusTagType(status) {
-  const map = { IN_USE: 'success', IDLE: 'info', BORROWED: 'warning', REPAIRING: 'danger', SCRAPPED: 'info' }
+  const map = { IN_USE: 'success', IDLE: 'info', REPAIRING: 'danger', SCRAPPED: 'info', LOSS: 'warning' }
   return map[status] || 'info'
 }
 
@@ -262,8 +260,8 @@ async function loadData() {
   loading.value = true
   try {
     const params = { ...queryForm }
-    if (params.minValue === null) delete params.minValue
-    if (params.maxValue === null) delete params.maxValue
+    if (params.minPrice === null) delete params.minPrice
+    if (params.maxPrice === null) delete params.maxPrice
     const res = await getAssetList(params)
     tableData.value = res.records || res.list || []
     total.value = res.total || 0
@@ -302,8 +300,8 @@ function handleReset() {
   queryForm.categoryId = null
   queryForm.status = ''
   queryForm.collegeId = null
-  queryForm.minValue = null
-  queryForm.maxValue = null
+  queryForm.minPrice = null
+  queryForm.maxPrice = null
   handleQuery()
 }
 
@@ -320,11 +318,11 @@ function handleAdd() {
     name: '',
     categoryId: null,
     collegeId: null,
-    value: 0,
+    purchasePrice: 0,
     status: 'IDLE',
     location: '',
     purchaseDate: '',
-    description: ''
+    remark: ''
   })
   dialogVisible.value = true
 }
@@ -392,8 +390,8 @@ async function handleExport() {
     const params = { ...queryForm }
     delete params.pageNum
     delete params.pageSize
-    if (params.minValue === null) delete params.minValue
-    if (params.maxValue === null) delete params.maxValue
+    if (params.minPrice === null) delete params.minPrice
+    if (params.maxPrice === null) delete params.maxPrice
     const res = await exportAsset(params)
     const url = window.URL.createObjectURL(new Blob([res]))
     const link = document.createElement('a')

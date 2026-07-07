@@ -7,7 +7,7 @@
             <el-avatar :size="80" class="avatar">
               {{ userName ? userName.charAt(0).toUpperCase() : 'U' }}
             </el-avatar>
-            <h3 class="name">{{ userInfo?.name || userInfo?.username || '用户' }}</h3>
+            <h3 class="name">{{ userInfo?.realName || userInfo?.username || '用户' }}</h3>
             <p class="role">
               <el-tag :type="roleTagType">{{ roleText }}</el-tag>
             </p>
@@ -40,8 +40,8 @@
               <el-form-item label="用户名" prop="username">
                 <el-input v-model="infoForm.username" disabled />
               </el-form-item>
-              <el-form-item label="姓名" prop="name">
-                <el-input v-model="infoForm.name" />
+              <el-form-item label="姓名" prop="realName">
+                <el-input v-model="infoForm.realName" />
               </el-form-item>
               <el-form-item label="邮箱" prop="email">
                 <el-input v-model="infoForm.email" />
@@ -90,7 +90,7 @@ const infoFormRef = ref(null)
 const passwordFormRef = ref(null)
 
 const userInfo = computed(() => userStore.userInfo)
-const userName = computed(() => userInfo.value?.name || userInfo.value?.username)
+const userName = computed(() => userInfo.value?.realName || userInfo.value?.username)
 
 const roleText = computed(() => {
   const map = { SUPER_ADMIN: '超级管理员', COLLEGE_ADMIN: '学院管理员', USER: '普通用户' }
@@ -104,13 +104,13 @@ const roleTagType = computed(() => {
 
 const infoForm = reactive({
   username: '',
-  name: '',
+  realName: '',
   email: '',
   phone: ''
 })
 
 const infoRules = {
-  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }]
+  realName: [{ required: true, message: '请输入姓名', trigger: 'blur' }]
 }
 
 const passwordForm = reactive({
@@ -142,7 +142,7 @@ const passwordRules = {
 function loadUserInfo() {
   if (userInfo.value) {
     infoForm.username = userInfo.value.username || ''
-    infoForm.name = userInfo.value.name || ''
+    infoForm.realName = userInfo.value.realName || ''
     infoForm.email = userInfo.value.email || ''
     infoForm.phone = userInfo.value.phone || ''
   }
@@ -154,8 +154,8 @@ async function handleUpdateInfo() {
     if (valid) {
       infoLoading.value = true
       try {
-        const res = await updateInfo(infoForm)
-        userStore.updateUserInfo(res)
+        await updateInfo(infoForm)
+        userStore.updateUserInfo({ ...userInfo.value, ...infoForm })
         ElMessage.success('修改成功')
       } catch (error) {
         console.error('Update info error:', error)

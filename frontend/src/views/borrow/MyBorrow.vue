@@ -12,12 +12,12 @@
         <el-form-item label="状态">
           <el-select v-model="queryForm.status" placeholder="全部" clearable style="width: 140px">
             <el-option label="待学院审批" value="PENDING_COLLEGE" />
-            <el-option label="待校级审批" value="PENDING_SCHOOL" />
-            <el-option label="已批准" value="APPROVED" />
+            <el-option label="待校级审批" value="PENDING_SUPER" />
+            <el-option label="待领用" value="APPROVED" />
             <el-option label="已拒绝" value="REJECTED" />
             <el-option label="已领用" value="BORROWED" />
+            <el-option label="待归还确认" value="RETURNING" />
             <el-option label="已归还" value="RETURNED" />
-            <el-option label="已取消" value="CANCELLED" />
           </el-select>
         </el-form-item>
         <el-form-item label="资产名称">
@@ -33,19 +33,19 @@
         <el-table-column prop="id" label="ID" width="70" />
         <el-table-column prop="assetName" label="资产名称" min-width="150" show-overflow-tooltip />
         <el-table-column prop="assetNo" label="资产编号" width="140" />
-        <el-table-column prop="reason" label="领用原因" show-overflow-tooltip min-width="150" />
+        <el-table-column prop="purpose" label="领用原因" show-overflow-tooltip min-width="150" />
         <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="borrowTime" label="领用时间" width="170" />
-        <el-table-column prop="expectedReturnTime" label="预计归还" width="170" />
-        <el-table-column prop="actualReturnTime" label="实际归还" width="170" />
+        <el-table-column prop="createTime" label="申请时间" width="170" />
+        <el-table-column prop="expectedReturnDate" label="预计归还" width="140" />
+        <el-table-column prop="updateTime" label="更新时间" width="170" />
         <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="handleView(row)">详情</el-button>
-            <el-button v-if="row.status === 'PENDING_COLLEGE' || row.status === 'PENDING_SCHOOL'" type="warning" link size="small" @click="handleCancel(row)">取消</el-button>
+            <el-button v-if="row.status === 'PENDING_COLLEGE' || row.status === 'PENDING_SUPER'" type="warning" link size="small" @click="handleCancel(row)">取消</el-button>
             <el-button v-if="row.status === 'APPROVED'" type="success" link size="small" @click="handleConfirm(row)">确认领用</el-button>
             <el-button v-if="row.status === 'BORROWED'" type="primary" link size="small" @click="handleReturn(row)">申请归还</el-button>
           </template>
@@ -64,33 +64,31 @@
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.assetName || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="申请人">{{ detailData.applicantName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="申请人">{{ detailData.userName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusTagType(detailData.status)">{{ statusText(detailData.status) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="领用时间">{{ detailData.borrowTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="预计归还">{{ detailData.expectedReturnTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="实际归还">{{ detailData.actualReturnTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="申请时间">{{ detailData.applyTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="领用原因" :span="2">{{ detailData.reason || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ detailData.remark || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="申请时间">{{ detailData.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="预计归还">{{ detailData.expectedReturnDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ detailData.updateTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="领用原因" :span="2">{{ detailData.purpose || '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <el-divider content-position="left">审批记录</el-divider>
-      <el-timeline v-if="detailData.approvalRecords && detailData.approvalRecords.length > 0">
+      <el-timeline v-if="detailData.approvalHistory && detailData.approvalHistory.length > 0">
         <el-timeline-item
-          v-for="(record, index) in detailData.approvalRecords"
+          v-for="(record, index) in detailData.approvalHistory"
           :key="index"
-          :type="record.approved ? 'success' : 'danger'"
-          :timestamp="record.approveTime"
+          :type="record.approvalStatus === 'PASS' ? 'success' : 'danger'"
+          :timestamp="record.createTime"
         >
           <h4 style="margin: 0 0 5px 0">
             {{ record.approverName || '系统' }}
-            <el-tag size="small" :type="record.approved ? 'success' : 'danger'">
-              {{ record.approved ? '通过' : '拒绝' }}
+            <el-tag size="small" :type="record.approvalStatus === 'PASS' ? 'success' : 'danger'">
+              {{ record.statusName || record.approvalStatus }}
             </el-tag>
           </h4>
-          <p style="margin: 0; color: #606266; font-size: 13px">{{ record.remark || '无备注' }}</p>
+          <p style="margin: 0; color: #606266; font-size: 13px">{{ record.opinion || '无备注' }}</p>
         </el-timeline-item>
       </el-timeline>
       <el-empty v-else description="暂无审批记录" :image-size="80" />
@@ -106,7 +104,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Pagination from '@/components/Pagination.vue'
-import { getMyBorrowList, cancelBorrow, returnBorrow, getBorrowDetail } from '@/api/borrow'
+import { getMyBorrowList, cancelBorrow, confirmBorrow, returnBorrow, getBorrowDetail } from '@/api/borrow'
 
 const loading = ref(false)
 const tableData = ref([])
@@ -124,12 +122,12 @@ const queryForm = reactive({
 function statusText(status) {
   const map = {
     PENDING_COLLEGE: '待学院审批',
-    PENDING_SCHOOL: '待校级审批',
-    APPROVED: '已批准',
+    PENDING_SUPER: '待校级审批',
+    APPROVED: '待领用',
     REJECTED: '已拒绝',
     BORROWED: '已领用',
+    RETURNING: '待归还确认',
     RETURNED: '已归还',
-    CANCELLED: '已取消',
     PENDING: '待审批'
   }
   return map[status] || status
@@ -138,12 +136,12 @@ function statusText(status) {
 function statusTagType(status) {
   const map = {
     PENDING_COLLEGE: 'warning',
-    PENDING_SCHOOL: 'warning',
+    PENDING_SUPER: 'warning',
     APPROVED: 'success',
     REJECTED: 'danger',
     BORROWED: 'primary',
+    RETURNING: 'warning',
     RETURNED: 'info',
-    CANCELLED: 'info',
     PENDING: 'warning'
   }
   return map[status] || 'info'
@@ -210,7 +208,7 @@ function handleConfirm(row) {
     type: 'success'
   }).then(async () => {
     try {
-      await returnBorrow(row.id)
+      await confirmBorrow(row.id)
       ElMessage.success('确认领用成功')
       loadData()
     } catch (error) {

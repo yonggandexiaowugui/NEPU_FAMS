@@ -20,6 +20,10 @@ public class RepairOrder {
 
     private String faultDescription;
 
+    private String remark;
+
+    private String attachmentUrls;
+
     private String priority;
 
     private String status;

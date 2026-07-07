@@ -15,4 +15,8 @@ public class BorrowQueryDTO extends PageQuery {
     private Long applicantId;
 
     private Long collegeId;
+
+    private Boolean pending;
+
+    private Boolean approved;
 }

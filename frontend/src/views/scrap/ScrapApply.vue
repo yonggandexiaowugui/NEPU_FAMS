@@ -8,7 +8,8 @@
       <el-form :inline="true" :model="queryForm" class="query-form">
         <el-form-item label="状态">
           <el-select v-model="queryForm.status" placeholder="全部" clearable style="width: 120px">
-            <el-option label="待审批" value="PENDING" />
+            <el-option label="待学院审批" value="PENDING_COLLEGE" />
+            <el-option label="待校级审批" value="PENDING_SUPER" />
             <el-option label="已批准" value="APPROVED" />
             <el-option label="已拒绝" value="REJECTED" />
           </el-select>
@@ -31,10 +32,10 @@
             <el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="applyTime" label="申请时间" width="180" />
+        <el-table-column prop="createTime" label="申请时间" width="180" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button v-if="row.status === 'PENDING'" type="warning" link @click="handleCancel(row)">取消</el-button>
+            <el-button v-if="row.status === 'PENDING' || row.status === 'PENDING_COLLEGE'" type="warning" link @click="handleCancel(row)">取消</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -62,9 +63,7 @@
         <el-form-item label="报废原因" prop="reason">
           <el-input v-model="form.reason" type="textarea" :rows="4" placeholder="请输入报废原因" />
         </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" :rows="3" />
-        </el-form-item>
+
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -78,7 +77,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Pagination from '@/components/Pagination.vue'
-import { getScrapList, applyScrap, cancelScrap } from '@/api/scrap'
+import { getMyScrapList, applyScrap, cancelScrap } from '@/api/scrap'
 import { getAssetList } from '@/api/asset'
 
 const loading = ref(false)
@@ -107,19 +106,19 @@ const formRules = {
 }
 
 function statusText(status) {
-  const map = { PENDING: '待审批', APPROVED: '已批准', REJECTED: '已拒绝' }
+  const map = { PENDING: '待审批', PENDING_COLLEGE: '待学院审批', PENDING_SUPER: '待校级审批', APPROVED: '已批准', REJECTED: '已拒绝' }
   return map[status] || status
 }
 
 function statusTagType(status) {
-  const map = { PENDING: 'warning', APPROVED: 'success', REJECTED: 'danger' }
+  const map = { PENDING: 'warning', PENDING_COLLEGE: 'warning', PENDING_SUPER: 'warning', APPROVED: 'success', REJECTED: 'danger' }
   return map[status] || 'info'
 }
 
 async function loadData() {
   loading.value = true
   try {
-    const res = await getScrapList(queryForm)
+    const res = await getMyScrapList(queryForm)
     tableData.value = res.records || res.list || []
     total.value = res.total || 0
   } catch (error) {

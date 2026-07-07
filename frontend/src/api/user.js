@@ -47,6 +47,14 @@ export function updateUser(id, data) {
   })
 }
 
+export function resetUserPassword(id, data) {
+  return request({
+    url: `/user/${id}/password`,
+    method: 'put',
+    data
+  })
+}
+
 export function deleteUser(id) {
   return request({
     url: `/user/${id}`,

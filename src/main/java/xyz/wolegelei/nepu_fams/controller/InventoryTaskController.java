@@ -60,7 +60,7 @@ public class InventoryTaskController {
 
     @PostMapping("/start/{id}")
     public Result<Void> start(@PathVariable Long id) {
-        // TODO: 待实现 - InventoryTaskService 暂未提供 start 方法
+        inventoryTaskService.start(id);
         return Result.success();
     }
 

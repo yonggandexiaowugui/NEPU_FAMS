@@ -106,6 +106,7 @@ public class AssetCategoryServiceImpl implements AssetCategoryService {
         if (category.getSort() == null) {
             category.setSort(0);
         }
+        category.setIsDeleted(0);
 
         assetCategoryMapper.insert(category);
     }

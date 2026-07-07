@@ -71,6 +71,9 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         if (!AssetStatus.IDLE.getCode().equals(asset.getStatus())) {
             throw new BusinessException("只有闲置状态的资产才能被领用");
         }
+        if (currentUser.getCollegeId() == null || !asset.getCollegeId().equals(currentUser.getCollegeId())) {
+            throw new BusinessException("只能申请领用本学院资产");
+        }
 
         LambdaQueryWrapper<BorrowApplication> existWrapper = new LambdaQueryWrapper<>();
         existWrapper.eq(BorrowApplication::getAssetId, dto.getAssetId());
@@ -87,6 +90,7 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         application.setPurpose(dto.getPurpose());
         application.setExpectedReturnDate(dto.getExpectedReturnDate());
         application.setStatus(BorrowStatus.PENDING_COLLEGE.getCode());
+        application.setIsDeleted(0);
 
         borrowApplicationMapper.insert(application);
     }
@@ -122,9 +126,17 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
 
         if (RoleConstants.COLLEGE_ADMIN.equals(role)) {
             wrapper.eq(BorrowApplication::getCollegeId, currentUser.getCollegeId());
-            wrapper.eq(BorrowApplication::getStatus, BorrowStatus.PENDING_COLLEGE.getCode());
+            if (Boolean.TRUE.equals(dto.getPending())) {
+                wrapper.in(BorrowApplication::getStatus, BorrowStatus.PENDING_COLLEGE.getCode(), BorrowStatus.RETURNING.getCode());
+            } else if (Boolean.TRUE.equals(dto.getApproved())) {
+                wrapper.notIn(BorrowApplication::getStatus, BorrowStatus.PENDING_COLLEGE.getCode(), BorrowStatus.RETURNING.getCode());
+            }
         } else if (RoleConstants.SUPER_ADMIN.equals(role)) {
-            wrapper.eq(BorrowApplication::getStatus, BorrowStatus.PENDING_SUPER.getCode());
+            if (Boolean.TRUE.equals(dto.getPending())) {
+                wrapper.in(BorrowApplication::getStatus, BorrowStatus.PENDING_SUPER.getCode(), BorrowStatus.RETURNING.getCode());
+            } else if (Boolean.TRUE.equals(dto.getApproved())) {
+                wrapper.notIn(BorrowApplication::getStatus, BorrowStatus.PENDING_SUPER.getCode(), BorrowStatus.RETURNING.getCode());
+            }
         } else {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
@@ -176,7 +188,8 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
 
-        if (!RoleConstants.COLLEGE_ADMIN.equals(currentUser.getRole())) {
+        String role = currentUser.getRole();
+        if (!RoleConstants.COLLEGE_ADMIN.equals(role) && !RoleConstants.SUPER_ADMIN.equals(role)) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
 
@@ -189,12 +202,13 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
             throw new BusinessException("当前状态不允许学院审批");
         }
 
-        if (!application.getCollegeId().equals(currentUser.getCollegeId())) {
+        if (RoleConstants.COLLEGE_ADMIN.equals(role) && !application.getCollegeId().equals(currentUser.getCollegeId())) {
             throw new BusinessException("只能审批本学院的申请");
         }
 
-        boolean isPass = dto.getOpinion() == null || !dto.getOpinion().startsWith("驳回");
-        if (!isPass && !StringUtils.hasText(dto.getOpinion())) {
+        boolean isPass = Boolean.TRUE.equals(dto.getApproved());
+        String opinion = dto.getApprovalOpinion();
+        if (!isPass && !StringUtils.hasText(opinion)) {
             throw new BusinessException("驳回时必须填写审批意见");
         }
 
@@ -202,7 +216,7 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         approval.setApplicationId(dto.getApplicationId());
         approval.setApproverId(currentUserId);
         approval.setApprovalStatus(isPass ? "PASS" : "REJECT");
-        approval.setOpinion(dto.getOpinion());
+        approval.setOpinion(opinion);
         borrowApprovalMapper.insert(approval);
 
         if (isPass) {
@@ -235,8 +249,9 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
             throw new BusinessException("当前状态不允许校级审批");
         }
 
-        boolean isPass = dto.getOpinion() == null || !dto.getOpinion().startsWith("驳回");
-        if (!isPass && !StringUtils.hasText(dto.getOpinion())) {
+        boolean isPass = Boolean.TRUE.equals(dto.getApproved());
+        String opinion = dto.getApprovalOpinion();
+        if (!isPass && !StringUtils.hasText(opinion)) {
             throw new BusinessException("驳回时必须填写审批意见");
         }
 
@@ -244,18 +259,11 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         approval.setApplicationId(dto.getApplicationId());
         approval.setApproverId(currentUserId);
         approval.setApprovalStatus(isPass ? "PASS" : "REJECT");
-        approval.setOpinion(dto.getOpinion());
+        approval.setOpinion(opinion);
         borrowApprovalMapper.insert(approval);
 
         if (isPass) {
             application.setStatus(BorrowStatus.APPROVED.getCode());
-
-            Asset asset = assetMapper.selectById(application.getAssetId());
-            if (asset != null) {
-                asset.setStatus(AssetStatus.IN_USE.getCode());
-                asset.setUserId(application.getUserId());
-                assetMapper.updateById(asset);
-            }
         } else {
             application.setStatus(BorrowStatus.REJECTED.getCode());
         }
@@ -286,6 +294,13 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
 
         application.setStatus(BorrowStatus.BORROWED.getCode());
         borrowApplicationMapper.updateById(application);
+
+        Asset asset = assetMapper.selectById(application.getAssetId());
+        if (asset != null) {
+            asset.setStatus(AssetStatus.IN_USE.getCode());
+            asset.setUserId(application.getUserId());
+            assetMapper.updateById(asset);
+        }
     }
 
     @Override
@@ -372,8 +387,10 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
             throw new BusinessException("只能删除自己的申请");
         }
 
-        if (!BorrowStatus.REJECTED.getCode().equals(application.getStatus())) {
-            throw new BusinessException("只有已驳回状态的申请可以删除");
+        if (!BorrowStatus.REJECTED.getCode().equals(application.getStatus())
+                && !BorrowStatus.PENDING_COLLEGE.getCode().equals(application.getStatus())
+                && !BorrowStatus.PENDING_SUPER.getCode().equals(application.getStatus())) {
+            throw new BusinessException("只有待审批或已驳回状态的申请可以取消");
         }
 
         borrowApplicationMapper.deleteById(id);

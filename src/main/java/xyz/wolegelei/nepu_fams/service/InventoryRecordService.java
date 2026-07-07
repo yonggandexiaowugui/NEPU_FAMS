@@ -2,6 +2,7 @@ package xyz.wolegelei.nepu_fams.service;
 
 import xyz.wolegelei.nepu_fams.dto.inventory.InventoryRecordBatchDTO;
 import xyz.wolegelei.nepu_fams.dto.inventory.InventoryRecordDTO;
+import xyz.wolegelei.nepu_fams.vo.inventory.InventoryAnalysisVO;
 import xyz.wolegelei.nepu_fams.vo.inventory.InventoryDiffVO;
 import xyz.wolegelei.nepu_fams.vo.inventory.InventoryRecordVO;
 
@@ -16,6 +17,10 @@ public interface InventoryRecordService {
     void batchAddRecords(InventoryRecordBatchDTO dto);
 
     List<InventoryDiffVO> getDiffList(Long taskId);
+
+    InventoryAnalysisVO analyzeDiff(Long taskId);
+
+    String generateAiDiffAnalysis(Long taskId);
 
     void confirmDiff(Long taskId, List<Long> assetIds);
 }

@@ -17,13 +17,25 @@ public class InventoryDiffVO implements Serializable {
 
     private String location;
 
+    private String collegeName;
+
     private Integer bookQuantity;
 
+    private Integer bookCount;
+
     private Integer actualQuantity;
+
+    private Integer actualCount;
 
     private String diffType;
 
     private Integer diffQuantity;
+
+    private String riskLevel;
+
+    private String analysis;
+
+    private String suggestion;
 
     private String remark;
 }

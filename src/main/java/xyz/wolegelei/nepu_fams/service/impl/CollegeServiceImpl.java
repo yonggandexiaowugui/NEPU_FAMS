@@ -48,6 +48,7 @@ public class CollegeServiceImpl implements CollegeService {
         if (collegeMapper.selectCount(wrapper) > 0) {
             throw new BusinessException(ResultCode.COLLEGE_CODE_EXISTS);
         }
+        college.setIsDeleted(0);
         collegeMapper.insert(college);
     }
 

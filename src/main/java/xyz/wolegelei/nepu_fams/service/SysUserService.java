@@ -1,6 +1,7 @@
 package xyz.wolegelei.nepu_fams.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import xyz.wolegelei.nepu_fams.dto.AdminResetPasswordDTO;
 import xyz.wolegelei.nepu_fams.dto.ChangePasswordDTO;
 import xyz.wolegelei.nepu_fams.dto.LoginDTO;
 import xyz.wolegelei.nepu_fams.dto.RegisterDTO;
@@ -29,6 +30,8 @@ public interface SysUserService {
     void updateUser(UserUpdateDTO dto);
 
     void changePassword(ChangePasswordDTO dto);
+
+    void adminResetPassword(Long id, AdminResetPasswordDTO dto);
 
     UserVO getCurrentUser();
 }

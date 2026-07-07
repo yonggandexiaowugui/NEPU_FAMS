@@ -9,4 +9,10 @@ public class RepairSubmitDTO implements Serializable {
     private Long assetId;
 
     private String faultDescription;
+
+    private String priority;
+
+    private String remark;
+
+    private String attachmentUrls;
 }

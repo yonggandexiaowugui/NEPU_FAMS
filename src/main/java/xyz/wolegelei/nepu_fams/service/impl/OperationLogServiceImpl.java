@@ -69,6 +69,25 @@ public class OperationLogServiceImpl implements OperationLogService {
     }
 
     @Override
+    public void delete(Long id) {
+        OperationLog log = operationLogMapper.selectById(id);
+        if (log == null) {
+            throw new RuntimeException("日志不存在");
+        }
+        operationLogMapper.deleteById(id);
+    }
+
+    @Override
+    public void clear() {
+        Long currentUserId = StpUtil.getLoginIdAsLong();
+        SysUser currentUser = sysUserMapper.selectById(currentUserId);
+        if (currentUser == null || !RoleConstants.SUPER_ADMIN.equals(currentUser.getRole())) {
+            throw new RuntimeException("只有超级管理员可以清空日志");
+        }
+        operationLogMapper.delete(new LambdaQueryWrapper<OperationLog>().isNotNull(OperationLog::getId));
+    }
+
+    @Override
     public List<OperationLogVO> export(OperationLogQueryDTO dto) {
         Long currentUserId = StpUtil.getLoginIdAsLong();
         SysUser currentUser = sysUserMapper.selectById(currentUserId);
@@ -114,6 +133,23 @@ public class OperationLogServiceImpl implements OperationLogService {
         }
 
         return wrapper;
+    }
+
+    private void checkLogPermission(OperationLog log, SysUser currentUser) {
+        String role = currentUser.getRole();
+        if (RoleConstants.SUPER_ADMIN.equals(role)) {
+            return;
+        }
+        if (RoleConstants.USER.equals(role) && currentUser.getId().equals(log.getUserId())) {
+            return;
+        }
+        if (RoleConstants.COLLEGE_ADMIN.equals(role)) {
+            List<Long> collegeUserIds = getCollegeUserIds(currentUser.getCollegeId());
+            if (collegeUserIds.contains(log.getUserId())) {
+                return;
+            }
+        }
+        throw new RuntimeException("无权查看该日志");
     }
 
     private List<Long> getCollegeUserIds(Long collegeId) {

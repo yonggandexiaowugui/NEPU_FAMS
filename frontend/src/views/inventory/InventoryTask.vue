@@ -28,7 +28,9 @@
       <el-table :data="tableData" border stripe v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="任务名称" />
-        <el-table-column prop="description" label="描述" show-overflow-tooltip />
+        <el-table-column prop="collegeName" label="盘点学院" width="140" show-overflow-tooltip />
+        <el-table-column prop="totalCount" label="资产总数" width="100" align="center" />
+        <el-table-column prop="checkedCount" label="已盘点" width="100" align="center" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>
@@ -58,9 +60,6 @@
       <el-form :model="form" :rules="formRules" ref="formRef" label-width="100px">
         <el-form-item label="任务名称" prop="name">
           <el-input v-model="form.name" />
-        </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input v-model="form.description" type="textarea" :rows="3" />
         </el-form-item>
         <el-form-item label="盘点范围" prop="collegeId">
           <el-select v-model="form.collegeId" style="width: 100%" clearable placeholder="全部学院">
@@ -115,7 +114,6 @@ const queryForm = reactive({
 const form = reactive({
   id: null,
   name: '',
-  description: '',
   collegeId: null
 })
 
@@ -176,7 +174,6 @@ function handleAdd() {
   Object.assign(form, {
     id: null,
     name: '',
-    description: '',
     collegeId: null
   })
   dialogVisible.value = true

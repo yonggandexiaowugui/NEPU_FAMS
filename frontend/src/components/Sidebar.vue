@@ -1,16 +1,8 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="nepu-emblem" v-if="!collapsed">
-        <div class="emblem-ring emblem-ring-outer"></div>
-        <div class="emblem-ring emblem-ring-middle"></div>
-        <div class="emblem-ring emblem-ring-inner"></div>
-        <span class="emblem-text">NEPU</span>
-      </div>
-      <div class="nepu-emblem-mini" v-else>
-        <div class="emblem-ring emblem-ring-inner"></div>
-        <span class="emblem-text-mini">N</span>
-      </div>
+      <div class="brand-mark" v-if="!collapsed">NE</div>
+      <div class="brand-mark mini" v-else>N</div>
       <div class="logo-info" v-if="!collapsed">
         <span class="logo-text">NEPU-FAMS</span>
         <span class="logo-sub">固定资产管理系统</span>
@@ -21,9 +13,9 @@
       class="sidebar-menu"
       :collapse="collapsed"
       :collapse-transition="false"
-      background-color="#304156"
-      text-color="#bfcbd9"
-      active-text-color="#409EFF"
+      background-color="#ffffff"
+      text-color="#64748b"
+      active-text-color="#3157d5"
       router
     >
       <template v-for="item in menuList" :key="item.path">
@@ -128,187 +120,65 @@ const menuList = computed(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #060A12;
+  background: #ffffff;
 }
 
 .sidebar-logo {
-  height: 72px;
+  height: 76px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   padding: 0 16px;
-  background: linear-gradient(180deg, rgba(0, 229, 255, 0.06) 0%, rgba(0, 229, 255, 0.01) 100%);
-  border-bottom: 1px solid rgba(0, 229, 255, 0.08);
+  border-bottom: 1px solid #eef2f7;
   overflow: hidden;
-  position: relative;
-
-  /* Subtle glow at bottom */
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 20%;
-    right: 20%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.3), transparent);
-    box-shadow: 0 0 6px rgba(0, 229, 255, 0.2);
-  }
 }
 
-/* === NEPU Emblem - Concentric Circles === */
-.nepu-emblem {
-  position: relative;
-  width: 40px;
-  height: 40px;
+.brand-mark {
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.nepu-emblem-mini {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.emblem-ring {
-  position: absolute;
-  border-radius: 50%;
-  border-style: solid;
-  border-color: rgba(0, 229, 255, 0.25);
-
-  &.emblem-ring-outer {
-    width: 40px;
-    height: 40px;
-    border-width: 1.5px;
-    animation: ring-rotate 20s linear infinite;
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.08);
-    border-style: dashed;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: 50%;
-      width: 4px;
-      height: 4px;
-      background: #00E5FF;
-      border-radius: 50%;
-      box-shadow: 0 0 6px rgba(0, 229, 255, 0.8);
-      transform: translateX(-50%);
-    }
-  }
-
-  &.emblem-ring-middle {
-    width: 30px;
-    height: 30px;
-    border-width: 1px;
-    border-color: rgba(255, 184, 0, 0.15);
-    animation: ring-rotate 15s linear infinite reverse;
-  }
-
-  &.emblem-ring-inner {
-    width: 20px;
-    height: 20px;
-    border-width: 1.5px;
-    border-color: rgba(0, 229, 255, 0.4);
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.15), inset 0 0 8px rgba(0, 229, 255, 0.05);
-    background: radial-gradient(circle, rgba(0, 229, 255, 0.06), transparent);
-    animation: ring-pulse 3s ease-in-out infinite;
-  }
-
-  /* Mini version for collapsed sidebar */
-  .nepu-emblem-mini & {
-    &.emblem-ring-outer {
-      width: 32px;
-      height: 32px;
-    }
-
-    &.emblem-ring-middle {
-      width: 24px;
-      height: 24px;
-    }
-
-    &.emblem-ring-inner {
-      width: 16px;
-      height: 16px;
-    }
-  }
-}
-
-@keyframes ring-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes ring-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.15), inset 0 0 8px rgba(0, 229, 255, 0.05); }
-  50% { box-shadow: 0 0 16px rgba(0, 229, 255, 0.3), inset 0 0 16px rgba(0, 229, 255, 0.1); }
-}
-
-.emblem-text {
-  position: relative;
-  z-index: 2;
-  font-family: 'Orbitron', 'Microsoft YaHei', sans-serif;
-  font-size: 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #20345c 0%, #3157d5 100%);
+  color: #ffffff;
+  font-size: 13px;
   font-weight: 800;
-  color: #00E5FF;
-  text-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
-  letter-spacing: 1px;
-  line-height: 1;
+  box-shadow: 0 10px 22px rgba(49, 87, 213, 0.18);
+
+  &.mini {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
 }
 
-.emblem-text-mini {
-  position: relative;
-  z-index: 2;
-  font-family: 'Orbitron', 'Microsoft YaHei', sans-serif;
-  font-size: 10px;
-  font-weight: 800;
-  color: #00E5FF;
-  text-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
-  line-height: 1;
-}
-
-/* === Logo Text Area === */
 .logo-info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
+  min-width: 0;
 }
 
 .logo-text {
-  font-family: 'Orbitron', 'Microsoft YaHei', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: #00E5FF;
-  letter-spacing: 2px;
-  text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+  font-size: 15px;
+  font-weight: 800;
+  color: #172033;
   white-space: nowrap;
-  animation: logo-breathe 4s ease-in-out infinite;
 }
 
 .logo-sub {
-  font-size: 10px;
-  color: rgba(232, 236, 244, 0.35);
-  letter-spacing: 1px;
+  font-size: 11px;
+  color: #8792a5;
   white-space: nowrap;
-}
-
-@keyframes logo-breathe {
-  0%, 100% { text-shadow: 0 0 8px rgba(0, 229, 255, 0.3); }
-  50% { text-shadow: 0 0 16px rgba(0, 229, 255, 0.6), 0 0 32px rgba(0, 229, 255, 0.15); }
 }
 
 .sidebar-menu {
   flex: 1;
   border-right: none;
-  padding: 8px 0;
+  padding: 12px 10px;
 }
 
 :deep(.el-menu) {
@@ -317,54 +187,53 @@ const menuList = computed(() => {
 
   .el-menu-item,
   .el-sub-menu__title {
-    color: rgba(232, 236, 244, 0.5);
-    margin: 2px 8px;
+    height: 42px;
+    line-height: 42px;
+    margin: 3px 0;
     border-radius: 8px;
-    height: 44px;
-    line-height: 44px;
+    color: #64748b;
     font-size: 14px;
-    transition: all 0.25s ease;
+    font-weight: 550;
+    transition: all 0.18s ease;
 
     &:hover {
-      background: rgba(0, 229, 255, 0.06);
-      color: #00E5FF;
-      text-shadow: 0 0 6px rgba(0, 229, 255, 0.3);
+      background: #f4f7fb;
+      color: #172033;
     }
 
     .el-icon {
       color: inherit;
+      font-size: 17px;
     }
   }
 
   .el-menu-item.is-active {
-    background: linear-gradient(90deg, rgba(0, 229, 255, 0.14), rgba(0, 229, 255, 0.04));
-    color: #00E5FF;
-    text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
-    box-shadow: inset 3px 0 0 #00E5FF, 0 0 12px rgba(0, 229, 255, 0.15);
-    font-weight: 600;
+    position: relative;
+    background: #eef3ff;
+    color: #3157d5;
+    font-weight: 700;
+    box-shadow: none;
 
     .el-icon {
-      color: #00E5FF;
+      color: #3157d5;
     }
 
     &::before {
       content: '';
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 9px;
       width: 3px;
-      height: 60%;
-      background: #00E5FF;
-      border-radius: 0 2px 2px 0;
-      box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+      height: 24px;
+      border-radius: 0 999px 999px 0;
+      background: #3157d5;
     }
   }
 
-  .el-sub-menu {
-    .el-menu {
-      background: rgba(0, 229, 255, 0.02);
-    }
+  .el-sub-menu .el-menu {
+    background: #fbfcff;
+    border-radius: 8px;
+    margin: 2px 0 6px;
   }
 }
 </style>

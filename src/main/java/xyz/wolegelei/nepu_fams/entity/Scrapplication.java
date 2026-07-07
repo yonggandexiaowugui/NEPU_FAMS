@@ -20,11 +20,21 @@ public class Scrapplication {
 
     private String reason;
 
+    private String attachmentUrls;
+
     private String status;
 
     private Long approverId;
 
     private String approvalOpinion;
+
+    private Long collegeApproverId;
+
+    private String collegeApprovalOpinion;
+
+    private Long superApproverId;
+
+    private String superApprovalOpinion;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

@@ -16,8 +16,8 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="registerForm.username" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="真实姓名" prop="name">
-          <el-input v-model="registerForm.name" placeholder="请输入真实姓名" />
+        <el-form-item label="真实姓名" prop="realName">
+          <el-input v-model="registerForm.realName" placeholder="请输入真实姓名" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="registerForm.password" type="password" placeholder="请输入密码" show-password />
@@ -69,7 +69,7 @@ const collegeList = ref([])
 
 const registerForm = reactive({
   username: '',
-  name: '',
+  realName: '',
   password: '',
   confirmPassword: '',
   email: '',
@@ -91,7 +91,7 @@ const registerRules = {
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
   ],
-  name: [
+  realName: [
     { required: true, message: '请输入真实姓名', trigger: 'blur' }
   ],
   password: [

@@ -39,9 +39,23 @@ export function approveBorrow(id, data) {
   })
 }
 
+export function confirmBorrow(id) {
+  return request({
+    url: `/borrow/confirm/${id}`,
+    method: 'post'
+  })
+}
+
 export function returnBorrow(id) {
   return request({
     url: `/borrow/return/${id}`,
+    method: 'post'
+  })
+}
+
+export function confirmReturn(id) {
+  return request({
+    url: `/borrow/return/confirm/${id}`,
     method: 'post'
   })
 }

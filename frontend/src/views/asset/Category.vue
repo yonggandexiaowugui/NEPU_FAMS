@@ -10,9 +10,7 @@
       
       <el-table :data="tableData" border stripe v-loading="loading" row-key="id">
         <el-table-column prop="name" label="分类名称" />
-        <el-table-column prop="code" label="分类编码" width="150" />
         <el-table-column prop="sort" label="排序" width="100" />
-        <el-table-column prop="createTime" label="创建时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleAddChild(row)">添加子分类</el-button>
@@ -31,14 +29,8 @@
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="分类编码" prop="code">
-          <el-input v-model="form.code" />
-        </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input-number v-model="form.sort" :min="0" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" :rows="3" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -67,14 +59,11 @@ const form = reactive({
   id: null,
   parentId: null,
   name: '',
-  code: '',
-  sort: 0,
-  remark: ''
+  sort: 0
 })
 
 const formRules = {
-  name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }],
-  code: [{ required: true, message: '请输入分类编码', trigger: 'blur' }]
+  name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
 }
 
 async function loadData() {
@@ -89,18 +78,20 @@ async function loadData() {
   }
 }
 
+function resetForm(parentId = null) {
+  Object.assign(form, {
+    id: null,
+    parentId,
+    name: '',
+    sort: 0
+  })
+}
+
 function handleAdd() {
   isEdit.value = false
   dialogTitle.value = '新增分类'
   parentName.value = ''
-  Object.assign(form, {
-    id: null,
-    parentId: null,
-    name: '',
-    code: '',
-    sort: 0,
-    remark: ''
-  })
+  resetForm()
   dialogVisible.value = true
 }
 
@@ -108,14 +99,7 @@ function handleAddChild(row) {
   isEdit.value = false
   dialogTitle.value = '新增子分类'
   parentName.value = row.name
-  Object.assign(form, {
-    id: null,
-    parentId: row.id,
-    name: '',
-    code: '',
-    sort: 0,
-    remark: ''
-  })
+  resetForm(row.id)
   dialogVisible.value = true
 }
 
@@ -123,30 +107,34 @@ function handleEdit(row) {
   isEdit.value = true
   dialogTitle.value = '编辑分类'
   parentName.value = ''
-  Object.assign(form, { ...row })
+  Object.assign(form, {
+    id: row.id,
+    parentId: row.parentId,
+    name: row.name,
+    sort: row.sort || 0
+  })
   dialogVisible.value = true
 }
 
 async function handleSubmit() {
   if (!formRef.value) return
   await formRef.value.validate(async (valid) => {
-    if (valid) {
-      submitLoading.value = true
-      try {
-        if (isEdit.value) {
-          await updateCategory(form.id, form)
-          ElMessage.success('修改成功')
-        } else {
-          await addCategory(form)
-          ElMessage.success('新增成功')
-        }
-        dialogVisible.value = false
-        loadData()
-      } catch (error) {
-        console.error('Submit error:', error)
-      } finally {
-        submitLoading.value = false
+    if (!valid) return
+    submitLoading.value = true
+    try {
+      if (isEdit.value) {
+        await updateCategory(form.id, form)
+        ElMessage.success('修改成功')
+      } else {
+        await addCategory(form)
+        ElMessage.success('新增成功')
       }
+      dialogVisible.value = false
+      loadData()
+    } catch (error) {
+      console.error('Submit error:', error)
+    } finally {
+      submitLoading.value = false
     }
   })
 }

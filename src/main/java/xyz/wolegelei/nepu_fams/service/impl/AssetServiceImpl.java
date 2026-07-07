@@ -74,7 +74,9 @@ public class AssetServiceImpl implements AssetService {
         LambdaQueryWrapper<Asset> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(dto.getKeyword())) {
-            wrapper.like(Asset::getName, dto.getKeyword());
+            wrapper.and(w -> w.like(Asset::getName, dto.getKeyword())
+                    .or()
+                    .like(Asset::getAssetNo, dto.getKeyword()));
         }
         if (dto.getCategoryId() != null) {
             wrapper.eq(Asset::getCategoryId, dto.getCategoryId());
@@ -96,7 +98,11 @@ public class AssetServiceImpl implements AssetService {
         if (RoleConstants.COLLEGE_ADMIN.equals(role)) {
             wrapper.eq(Asset::getCollegeId, currentUser.getCollegeId());
         } else if (RoleConstants.USER.equals(role)) {
-            wrapper.eq(Asset::getUserId, currentUser.getId());
+            if (currentUser.getCollegeId() == null) {
+                wrapper.eq(Asset::getId, -1L);
+            } else {
+                wrapper.eq(Asset::getCollegeId, currentUser.getCollegeId());
+            }
         }
 
         return wrapper;
@@ -104,9 +110,23 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     public AssetVO getById(Long id) {
+        Long currentUserId = StpUtil.getLoginIdAsLong();
+        SysUser currentUser = sysUserMapper.selectById(currentUserId);
+        if (currentUser == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
         Asset asset = assetMapper.selectById(id);
         if (asset == null) {
             throw new BusinessException(ResultCode.ASSET_NOT_FOUND);
+        }
+        String role = currentUser.getRole();
+        if (RoleConstants.COLLEGE_ADMIN.equals(role) && !asset.getCollegeId().equals(currentUser.getCollegeId())) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+        if (RoleConstants.USER.equals(role)
+                && !asset.getCollegeId().equals(currentUser.getCollegeId())
+                && !currentUserId.equals(asset.getUserId())) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
         }
         return convertToVO(asset);
     }
@@ -121,6 +141,7 @@ public class AssetServiceImpl implements AssetService {
 
         asset.setAssetNo(getAssetNo());
         asset.setStatus(AssetStatus.IDLE.getCode());
+        asset.setIsDeleted(0);
         if (asset.getCurrentValue() == null) {
             asset.setCurrentValue(asset.getPurchasePrice());
         }
@@ -136,6 +157,12 @@ public class AssetServiceImpl implements AssetService {
             throw new BusinessException(ResultCode.ASSET_NOT_FOUND);
         }
         checkDataPermissionForCollege(exist.getCollegeId());
+        if (dto.getCollegeId() != null) {
+            checkDataPermissionForCollege(dto.getCollegeId());
+        }
+        if (StringUtils.hasText(dto.getStatus()) && !isValidStatus(dto.getStatus())) {
+            throw new BusinessException("资产状态不正确");
+        }
 
         Asset asset = new Asset();
         BeanUtils.copyProperties(dto, asset);
@@ -215,6 +242,15 @@ public class AssetServiceImpl implements AssetService {
         }
 
         return prefix + String.format("%04d", sequence);
+    }
+
+    private boolean isValidStatus(String status) {
+        for (AssetStatus assetStatus : AssetStatus.values()) {
+            if (assetStatus.getCode().equals(status)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkAdminPermission() {

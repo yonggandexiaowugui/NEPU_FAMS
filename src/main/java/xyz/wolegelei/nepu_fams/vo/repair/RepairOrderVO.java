@@ -20,11 +20,17 @@ public class RepairOrderVO implements Serializable {
 
     private String userName;
 
+    private String reporterName;
+
     private Long collegeId;
 
     private String collegeName;
 
     private String faultDescription;
+
+    private String remark;
+
+    private String attachmentUrls;
 
     private String priority;
 
@@ -37,6 +43,8 @@ public class RepairOrderVO implements Serializable {
     private Long assigneeId;
 
     private String assigneeName;
+
+    private String repairerName;
 
     private String repairResult;
 

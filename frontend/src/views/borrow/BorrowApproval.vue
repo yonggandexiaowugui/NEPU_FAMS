@@ -11,9 +11,6 @@
       </el-tabs>
 
       <el-form :inline="true" :model="queryForm" class="query-form">
-        <el-form-item label="申请人">
-          <el-input v-model="queryForm.applicant" placeholder="请输入申请人" clearable style="width: 150px" />
-        </el-form-item>
         <el-form-item label="资产名称">
           <el-input v-model="queryForm.assetName" placeholder="请输入资产名称" clearable style="width: 150px" />
         </el-form-item>
@@ -31,24 +28,25 @@
 
       <el-table :data="tableData" border stripe v-loading="loading">
         <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="applicantName" label="申请人" width="110" />
+        <el-table-column prop="userName" label="申请人" width="110" />
         <el-table-column prop="assetName" label="资产名称" min-width="150" show-overflow-tooltip />
         <el-table-column prop="assetNo" label="资产编号" width="140" />
-        <el-table-column prop="reason" label="领用原因" show-overflow-tooltip min-width="150" />
+        <el-table-column prop="purpose" label="领用原因" show-overflow-tooltip min-width="150" />
         <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)" size="small">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="expectedReturnTime" label="预计归还" width="170" />
-        <el-table-column prop="applyTime" label="申请时间" width="170" />
+        <el-table-column prop="expectedReturnDate" label="预计归还" width="140" />
+        <el-table-column prop="createTime" label="申请时间" width="170" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="handleView(row)">详情</el-button>
-            <template v-if="activeTab === 'pending'">
+            <template v-if="activeTab === 'pending' && row.status !== 'RETURNING'">
               <el-button type="success" link size="small" @click="handleApprove(row)">批准</el-button>
               <el-button type="danger" link size="small" @click="handleReject(row)">拒绝</el-button>
             </template>
+            <el-button v-if="activeTab === 'pending' && row.status === 'RETURNING'" type="success" link size="small" @click="handleConfirmReturn(row)">确认归还</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -65,44 +63,42 @@
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.assetName || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="申请人">{{ detailData.applicantName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="申请人">{{ detailData.userName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="所属学院">{{ detailData.collegeName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusTagType(detailData.status)">{{ statusText(detailData.status) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="申请时间">{{ detailData.applyTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="领用时间">{{ detailData.borrowTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="预计归还">{{ detailData.expectedReturnTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="实际归还">{{ detailData.actualReturnTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="存放位置">{{ detailData.location || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="领用原因" :span="2">{{ detailData.reason || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ detailData.remark || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="申请时间">{{ detailData.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="预计归还">{{ detailData.expectedReturnDate || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ detailData.updateTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="领用原因" :span="2">{{ detailData.purpose || '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <el-divider content-position="left">审批记录</el-divider>
-      <el-timeline v-if="detailData.approvalRecords && detailData.approvalRecords.length > 0">
+      <el-timeline v-if="detailData.approvalHistory && detailData.approvalHistory.length > 0">
         <el-timeline-item
-          v-for="(record, index) in detailData.approvalRecords"
+          v-for="(record, index) in detailData.approvalHistory"
           :key="index"
-          :type="record.approved ? 'success' : 'danger'"
-          :timestamp="record.approveTime"
+          :type="record.approvalStatus === 'PASS' ? 'success' : 'danger'"
+          :timestamp="record.createTime"
         >
           <h4 style="margin: 0 0 5px 0">
             {{ record.approverName || '系统' }}
-            <el-tag size="small" :type="record.approved ? 'success' : 'danger'">
-              {{ record.approved ? '通过' : '拒绝' }}
+            <el-tag size="small" :type="record.approvalStatus === 'PASS' ? 'success' : 'danger'">
+              {{ record.statusName || record.approvalStatus }}
             </el-tag>
           </h4>
-          <p style="margin: 0; color: #606266; font-size: 13px">{{ record.remark || '无备注' }}</p>
+          <p style="margin: 0; color: #606266; font-size: 13px">{{ record.opinion || '无备注' }}</p>
         </el-timeline-item>
       </el-timeline>
       <el-empty v-else description="暂无审批记录" :image-size="80" />
 
       <template #footer>
-        <template v-if="activeTab === 'pending'">
+        <template v-if="activeTab === 'pending' && detailData?.status !== 'RETURNING'">
           <el-button type="danger" @click="handleReject(detailData)">拒绝</el-button>
           <el-button type="success" @click="handleApprove(detailData)">批准</el-button>
         </template>
+        <el-button v-if="activeTab === 'pending' && detailData?.status === 'RETURNING'" type="success" @click="handleConfirmReturn(detailData)">确认归还</el-button>
         <el-button @click="detailVisible = false">关闭</el-button>
       </template>
     </el-dialog>
@@ -125,7 +121,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Pagination from '@/components/Pagination.vue'
-import { getBorrowList, approveBorrow, getBorrowDetail } from '@/api/borrow'
+import { getBorrowList, approveBorrow, getBorrowDetail, confirmReturn } from '@/api/borrow'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -142,7 +138,6 @@ const queryForm = reactive({
   pageNum: 1,
   pageSize: 10,
   status: '',
-  applicant: '',
   assetName: ''
 })
 
@@ -157,12 +152,12 @@ const rejectRules = {
 function statusText(status) {
   const map = {
     PENDING_COLLEGE: '待学院审批',
-    PENDING_SCHOOL: '待校级审批',
-    APPROVED: '已批准',
+    PENDING_SUPER: '待校级审批',
+    APPROVED: '待领用',
     REJECTED: '已拒绝',
     BORROWED: '已领用',
+    RETURNING: '待归还确认',
     RETURNED: '已归还',
-    CANCELLED: '已取消',
     PENDING: '待审批'
   }
   return map[status] || status
@@ -171,12 +166,12 @@ function statusText(status) {
 function statusTagType(status) {
   const map = {
     PENDING_COLLEGE: 'warning',
-    PENDING_SCHOOL: 'warning',
+    PENDING_SUPER: 'warning',
     APPROVED: 'success',
     REJECTED: 'danger',
     BORROWED: 'primary',
+    RETURNING: 'warning',
     RETURNED: 'info',
-    CANCELLED: 'info',
     PENDING: 'warning'
   }
   return map[status] || 'info'
@@ -213,7 +208,6 @@ function handleQuery() {
 }
 
 function handleReset() {
-  queryForm.applicant = ''
   queryForm.assetName = ''
   queryForm.status = ''
   handleQuery()
@@ -254,6 +248,23 @@ function handleReject(row) {
   currentRow.value = row
   rejectForm.remark = ''
   rejectVisible.value = true
+}
+
+function handleConfirmReturn(row) {
+  ElMessageBox.confirm('确定该资产已经归还吗？', '确认归还', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'success'
+  }).then(async () => {
+    try {
+      await confirmReturn(row.id)
+      ElMessage.success('归还确认成功')
+      detailVisible.value = false
+      loadData()
+    } catch (error) {
+      console.error('Confirm return error:', error)
+    }
+  }).catch(() => {})
 }
 
 async function submitReject() {

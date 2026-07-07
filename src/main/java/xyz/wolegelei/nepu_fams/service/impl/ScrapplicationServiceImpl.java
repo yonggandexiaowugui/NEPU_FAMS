@@ -48,6 +48,12 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
             BorrowStatus.RETURNING.getCode()
     );
 
+    private static final List<String> ACTIVE_SCRAP_STATUSES = Arrays.asList(
+            ScrapStatus.PENDING.getCode(),
+            ScrapStatus.PENDING_COLLEGE.getCode(),
+            ScrapStatus.PENDING_SUPER.getCode()
+    );
+
     @Override
     @Transactional
     public void apply(ScrapApplyDTO dto) {
@@ -84,7 +90,10 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
 
         LambdaQueryWrapper<Scrapplication> existWrapper = new LambdaQueryWrapper<>();
         existWrapper.eq(Scrapplication::getAssetId, dto.getAssetId());
-        existWrapper.eq(Scrapplication::getStatus, ScrapStatus.PENDING.getCode());
+        existWrapper.in(Scrapplication::getStatus,
+                ScrapStatus.PENDING.getCode(),
+                ScrapStatus.PENDING_COLLEGE.getCode(),
+                ScrapStatus.PENDING_SUPER.getCode());
         Long existCount = scrapplicationMapper.selectCount(existWrapper);
         if (existCount > 0) {
             throw new BusinessException("该资产已有待审核的报废申请");
@@ -95,7 +104,8 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
         application.setCollegeId(currentUser.getCollegeId());
         application.setProposerId(currentUserId);
         application.setReason(dto.getReason());
-        application.setStatus(ScrapStatus.PENDING.getCode());
+        application.setStatus(ScrapStatus.PENDING_COLLEGE.getCode());
+        application.setIsDeleted(0);
 
         scrapplicationMapper.insert(application);
     }
@@ -114,7 +124,14 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
 
         if (RoleConstants.COLLEGE_ADMIN.equals(role)) {
             wrapper.eq(Scrapplication::getCollegeId, currentUser.getCollegeId());
-        } else if (!RoleConstants.SUPER_ADMIN.equals(role)) {
+            if (!Boolean.TRUE.equals(dto.getApproved()) && !StringUtils.hasText(dto.getStatus())) {
+                wrapper.in(Scrapplication::getStatus, ScrapStatus.PENDING.getCode(), ScrapStatus.PENDING_COLLEGE.getCode());
+            }
+        } else if (RoleConstants.SUPER_ADMIN.equals(role)) {
+            if (!Boolean.TRUE.equals(dto.getApproved()) && !StringUtils.hasText(dto.getStatus())) {
+                wrapper.in(Scrapplication::getStatus, ScrapStatus.PENDING_SUPER.getCode());
+            }
+        } else {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
 
@@ -145,49 +162,23 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
     @Override
     @Transactional
     public void approve(ScrapApprovalDTO dto) {
-        Long currentUserId = StpUtil.getLoginIdAsLong();
-        SysUser currentUser = sysUserMapper.selectById(currentUserId);
-        if (currentUser == null) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND);
-        }
-
-        if (!RoleConstants.SUPER_ADMIN.equals(currentUser.getRole())) {
-            throw new BusinessException(ResultCode.FORBIDDEN);
-        }
-
-        Scrapplication application = scrapplicationMapper.selectById(dto.getApplicationId());
-        if (application == null) {
-            throw new BusinessException(ResultCode.SCRAP_NOT_FOUND);
-        }
-
-        if (!ScrapStatus.PENDING.getCode().equals(application.getStatus())) {
-            throw new BusinessException("当前状态不允许审核");
-        }
-
-        application.setStatus(ScrapStatus.APPROVED.getCode());
-        application.setApproverId(currentUserId);
-        application.setApprovalOpinion(dto.getApprovalOpinion());
-        scrapplicationMapper.updateById(application);
-
-        Asset asset = assetMapper.selectById(application.getAssetId());
-        if (asset != null) {
-            asset.setStatus(AssetStatus.SCRAPPED.getCode());
-            asset.setUserId(null);
-            assetMapper.updateById(asset);
-        }
+        handleApproval(dto, true);
     }
 
     @Override
     @Transactional
     public void reject(ScrapApprovalDTO dto) {
+        if (!StringUtils.hasText(dto.getApprovalOpinion())) {
+            throw new BusinessException("驳回时必须填写审批意见");
+        }
+        handleApproval(dto, false);
+    }
+
+    private void handleApproval(ScrapApprovalDTO dto, boolean approved) {
         Long currentUserId = StpUtil.getLoginIdAsLong();
         SysUser currentUser = sysUserMapper.selectById(currentUserId);
         if (currentUser == null) {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
-        }
-
-        if (!RoleConstants.SUPER_ADMIN.equals(currentUser.getRole())) {
-            throw new BusinessException(ResultCode.FORBIDDEN);
         }
 
         Scrapplication application = scrapplicationMapper.selectById(dto.getApplicationId());
@@ -195,18 +186,44 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
             throw new BusinessException(ResultCode.SCRAP_NOT_FOUND);
         }
 
-        if (!ScrapStatus.PENDING.getCode().equals(application.getStatus())) {
-            throw new BusinessException("当前状态不允许审核");
+        String role = currentUser.getRole();
+        String status = application.getStatus();
+
+        if (RoleConstants.COLLEGE_ADMIN.equals(role)) {
+            if (!application.getCollegeId().equals(currentUser.getCollegeId())) {
+                throw new BusinessException("只能处理本学院报废申请");
+            }
+            if (!ScrapStatus.PENDING_COLLEGE.getCode().equals(status) && !ScrapStatus.PENDING.getCode().equals(status)) {
+                throw new BusinessException("学院管理员只能处理待学院审核的申请");
+            }
+            application.setCollegeApproverId(currentUserId);
+            application.setCollegeApprovalOpinion(dto.getApprovalOpinion());
+            application.setApproverId(currentUserId);
+            application.setApprovalOpinion(dto.getApprovalOpinion());
+            application.setStatus(approved ? ScrapStatus.PENDING_SUPER.getCode() : ScrapStatus.REJECTED.getCode());
+        } else if (RoleConstants.SUPER_ADMIN.equals(role)) {
+            if (!ScrapStatus.PENDING_SUPER.getCode().equals(status) && !ScrapStatus.PENDING.getCode().equals(status)) {
+                throw new BusinessException("超级管理员只能处理待校级审核的申请");
+            }
+            application.setSuperApproverId(currentUserId);
+            application.setSuperApprovalOpinion(dto.getApprovalOpinion());
+            application.setApproverId(currentUserId);
+            application.setApprovalOpinion(dto.getApprovalOpinion());
+            application.setStatus(approved ? ScrapStatus.APPROVED.getCode() : ScrapStatus.REJECTED.getCode());
+        } else {
+            throw new BusinessException(ResultCode.FORBIDDEN);
         }
 
-        if (!StringUtils.hasText(dto.getApprovalOpinion())) {
-            throw new BusinessException("驳回时必须填写审批意见");
-        }
-
-        application.setStatus(ScrapStatus.REJECTED.getCode());
-        application.setApproverId(currentUserId);
-        application.setApprovalOpinion(dto.getApprovalOpinion());
         scrapplicationMapper.updateById(application);
+
+        if (approved && ScrapStatus.APPROVED.getCode().equals(application.getStatus())) {
+            Asset asset = assetMapper.selectById(application.getAssetId());
+            if (asset != null) {
+                asset.setStatus(AssetStatus.SCRAPPED.getCode());
+                asset.setUserId(null);
+                assetMapper.updateById(asset);
+            }
+        }
     }
 
     @Override
@@ -271,9 +288,10 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
             throw new BusinessException("只能删除自己发起的申请");
         }
 
-        if (!ScrapStatus.PENDING.getCode().equals(application.getStatus())
+        if (!ScrapStatus.PENDING_COLLEGE.getCode().equals(application.getStatus())
+                && !ScrapStatus.PENDING.getCode().equals(application.getStatus())
                 && !ScrapStatus.REJECTED.getCode().equals(application.getStatus())) {
-            throw new BusinessException("只有待审核或已驳回状态的申请可以删除");
+            throw new BusinessException("只有待学院审核或已驳回状态的申请可以删除");
         }
 
         scrapplicationMapper.deleteById(id);
@@ -336,12 +354,7 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
             vo.setProposerName(proposer.getRealName());
         }
 
-        if (application.getApproverId() != null) {
-            SysUser approver = sysUserMapper.selectById(application.getApproverId());
-            if (approver != null) {
-                vo.setApproverName(approver.getRealName());
-            }
-        }
+        fillApproverNames(application, vo);
 
         if (application.getCollegeId() != null) {
             College college = collegeMapper.selectById(application.getCollegeId());
@@ -351,5 +364,26 @@ public class ScrapplicationServiceImpl implements ScrapplicationService {
         }
 
         return vo;
+    }
+
+    private void fillApproverNames(Scrapplication application, ScrapplicationVO vo) {
+        if (application.getApproverId() != null) {
+            SysUser approver = sysUserMapper.selectById(application.getApproverId());
+            if (approver != null) {
+                vo.setApproverName(approver.getRealName());
+            }
+        }
+        if (application.getCollegeApproverId() != null) {
+            SysUser approver = sysUserMapper.selectById(application.getCollegeApproverId());
+            if (approver != null) {
+                vo.setCollegeApproverName(approver.getRealName());
+            }
+        }
+        if (application.getSuperApproverId() != null) {
+            SysUser approver = sysUserMapper.selectById(application.getSuperApproverId());
+            if (approver != null) {
+                vo.setSuperApproverName(approver.getRealName());
+            }
+        }
     }
 }

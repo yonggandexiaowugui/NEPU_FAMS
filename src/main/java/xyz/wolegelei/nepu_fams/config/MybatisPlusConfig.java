@@ -31,14 +31,20 @@ public class MybatisPlusConfig {
         return new MetaObjectHandler() {
             @Override
             public void insertFill(MetaObject metaObject) {
-                this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "isDeleted", Integer.class, 0);
+                if (metaObject.getValue("createTime") == null) {
+                    this.setFieldValByName("createTime", LocalDateTime.now(), metaObject);
+                }
+                if (metaObject.getValue("updateTime") == null) {
+                    this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
+                }
+                if (metaObject.getValue("isDeleted") == null) {
+                    this.setFieldValByName("isDeleted", 0, metaObject);
+                }
             }
 
             @Override
             public void updateFill(MetaObject metaObject) {
-                this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+                this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
             }
         };
     }

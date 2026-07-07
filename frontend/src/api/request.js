@@ -24,6 +24,10 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   (response) => {
+    const { responseType } = response.config
+    if (responseType === 'blob') {
+      return response.data
+    }
     const res = response.data
     if (res.code !== 200) {
       ElMessage.error(res.msg || '请求失败')
@@ -37,12 +41,15 @@ service.interceptors.response.use(
   },
   (error) => {
     console.error('Response error:', error)
-    if (error.response?.status === 401) {
-      clearAuth()
-      router.push('/login')
-      ElMessage.error('登录已过期，请重新登录')
-    } else {
-      ElMessage.error(error.response?.data?.msg || error.message || '网络错误')
+    const { responseType } = error.config || {}
+    if (responseType !== 'blob') {
+      if (error.response?.status === 401) {
+        clearAuth()
+        router.push('/login')
+        ElMessage.error('登录已过期，请重新登录')
+      } else {
+        ElMessage.error(error.response?.data?.msg || error.message || '网络错误')
+      }
     }
     return Promise.reject(error)
   }

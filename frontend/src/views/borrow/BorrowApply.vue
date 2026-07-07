@@ -16,20 +16,17 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="领用原因" prop="reason">
-          <el-input v-model="form.reason" type="textarea" :rows="4" placeholder="请输入领用原因" />
+        <el-form-item label="领用原因" prop="purpose">
+          <el-input v-model="form.purpose" type="textarea" :rows="4" placeholder="请输入领用原因" />
         </el-form-item>
-        <el-form-item label="预计归还时间" prop="expectedReturnTime">
+        <el-form-item label="预计归还日期" prop="expectedReturnDate">
           <el-date-picker
-            v-model="form.expectedReturnTime"
-            type="datetime"
-            placeholder="请选择预计归还时间"
+            v-model="form.expectedReturnDate"
+            type="date"
+            placeholder="请选择预计归还日期"
             style="width: 100%"
-            value-format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD"
           />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入备注信息" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSubmit" :loading="loading">提交申请</el-button>
@@ -42,25 +39,26 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { applyBorrow } from '@/api/borrow'
 import { getAssetList } from '@/api/asset'
 
+const router = useRouter()
 const loading = ref(false)
 const formRef = ref(null)
 const assetList = ref([])
 
 const form = reactive({
   assetId: null,
-  reason: '',
-  expectedReturnTime: '',
-  remark: ''
+  purpose: '',
+  expectedReturnDate: ''
 })
 
 const formRules = {
   assetId: [{ required: true, message: '请选择资产', trigger: 'change' }],
-  reason: [{ required: true, message: '请输入领用原因', trigger: 'blur' }],
-  expectedReturnTime: [{ required: true, message: '请选择预计归还时间', trigger: 'change' }]
+  purpose: [{ required: true, message: '请输入领用原因', trigger: 'blur' }],
+  expectedReturnDate: [{ required: true, message: '请选择预计归还日期', trigger: 'change' }]
 }
 
 async function loadAssets() {
@@ -81,6 +79,7 @@ async function handleSubmit() {
         await applyBorrow(form)
         ElMessage.success('申请提交成功')
         handleReset()
+        router.push('/borrow/my')
       } catch (error) {
         console.error('Submit error:', error)
       } finally {

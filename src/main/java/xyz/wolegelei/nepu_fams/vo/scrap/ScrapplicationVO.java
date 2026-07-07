@@ -36,6 +36,18 @@ public class ScrapplicationVO implements Serializable {
 
     private String approvalOpinion;
 
+    private Long collegeApproverId;
+
+    private String collegeApproverName;
+
+    private String collegeApprovalOpinion;
+
+    private Long superApproverId;
+
+    private String superApproverName;
+
+    private String superApprovalOpinion;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

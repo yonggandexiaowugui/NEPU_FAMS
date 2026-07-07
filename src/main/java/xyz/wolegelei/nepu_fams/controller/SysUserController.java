@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.wolegelei.nepu_fams.annotation.OperationLog;
 import xyz.wolegelei.nepu_fams.common.PageResult;
 import xyz.wolegelei.nepu_fams.common.Result;
+import xyz.wolegelei.nepu_fams.dto.AdminResetPasswordDTO;
 import xyz.wolegelei.nepu_fams.dto.ChangePasswordDTO;
 import xyz.wolegelei.nepu_fams.dto.UserPageQueryDTO;
 import xyz.wolegelei.nepu_fams.dto.UserUpdateDTO;
@@ -43,6 +44,13 @@ public class SysUserController {
     public Result<PageResult<UserVO>> pageUser(UserPageQueryDTO dto) {
         IPage<UserVO> page = sysUserService.pageUser(dto);
         return Result.success(PageResult.of(page));
+    }
+
+    @OperationLog(value = "管理员重置用户密码", type = "UPDATE")
+    @PutMapping("/{id}/password")
+    public Result<Void> resetPassword(@PathVariable Long id, @Valid @RequestBody AdminResetPasswordDTO dto) {
+        sysUserService.adminResetPassword(id, dto);
+        return Result.success();
     }
 
     @GetMapping("/{id}")

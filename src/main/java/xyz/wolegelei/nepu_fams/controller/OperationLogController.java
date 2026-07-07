@@ -35,15 +35,15 @@ public class OperationLogController {
         return Result.success(vo);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     public Result<Void> delete(@PathVariable Long id) {
-        // TODO: 待实现 - OperationLogService 未继承 IService，暂无 removeById 方法
+        operationLogService.delete(id);
         return Result.success();
     }
 
     @DeleteMapping("/clear")
     public Result<Void> clear() {
-        // TODO: 待实现 - OperationLogService 未继承 IService，暂无 remove/list 方法
+        operationLogService.clear();
         return Result.success();
     }
 

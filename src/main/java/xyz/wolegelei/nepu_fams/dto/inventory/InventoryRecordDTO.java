@@ -16,5 +16,12 @@ public class InventoryRecordDTO implements Serializable {
 
     private Integer actualQuantity;
 
+    /**
+     * 兼容前端类表格字段命名。
+     */
+    private Integer actualCount;
+
+    private Boolean isChecked;
+
     private String remark;
 }
