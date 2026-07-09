@@ -60,7 +60,13 @@
       />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="领用详情" width="600px">
+    <el-dialog
+      v-model="detailVisible"
+      title="领用详情"
+      width="min(760px, calc(100vw - 32px))"
+      top="0"
+      append-to-body
+    >
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.assetName || '-' }}</el-descriptions-item>

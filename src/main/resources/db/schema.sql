@@ -35,6 +35,19 @@ CREATE TABLE sys_user (
     INDEX idx_college_id (college_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
+DROP TABLE IF EXISTS email_verification_code;
+CREATE TABLE email_verification_code (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '验证码ID',
+    email VARCHAR(100) NOT NULL COMMENT '邮箱',
+    code VARCHAR(10) NOT NULL COMMENT '验证码',
+    scene VARCHAR(30) NOT NULL COMMENT '场景：REGISTER',
+    expire_time DATETIME NOT NULL COMMENT '过期时间',
+    used TINYINT DEFAULT 0 COMMENT '是否已使用：0-未使用 1-已使用',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    INDEX idx_email_scene (email, scene),
+    INDEX idx_expire_time (expire_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='邮箱验证码表';
+
 DROP TABLE IF EXISTS asset_category;
 CREATE TABLE asset_category (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '分类ID',
@@ -64,6 +77,7 @@ CREATE TABLE asset (
     college_id BIGINT NOT NULL COMMENT '所属学院ID',
     user_id BIGINT COMMENT '使用人ID',
     responsible_person VARCHAR(50) COMMENT '责任人',
+    model_url VARCHAR(500) COMMENT '3D模型文件相对路径',
     remark VARCHAR(500) COMMENT '备注',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -182,6 +196,18 @@ CREATE TABLE inventory_record (
     INDEX idx_task_id (task_id),
     INDEX idx_asset_id (asset_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='盘点记录表';
+
+DROP TABLE IF EXISTS sys_3d_scene;
+CREATE TABLE sys_3d_scene (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '3D场景ID',
+    scene_name VARCHAR(100) NOT NULL COMMENT '场景名称',
+    scene_layout_json JSON COMMENT '场景布局JSON',
+    college_id BIGINT COMMENT '所属学院ID',
+    create_by BIGINT COMMENT '创建人ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    INDEX idx_college_id (college_id),
+    INDEX idx_create_by (create_by)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='3D场景表';
 
 DROP TABLE IF EXISTS operation_log;
 CREATE TABLE operation_log (

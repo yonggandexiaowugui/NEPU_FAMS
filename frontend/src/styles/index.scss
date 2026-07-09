@@ -375,10 +375,41 @@ img {
   animation: fade-in-scale 0.22s ease;
 }
 
+.el-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgba(15, 23, 42, 0.36) !important;
+  backdrop-filter: blur(3px);
+  overflow: hidden !important;
+}
+
+.el-overlay-dialog {
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 24px !important;
+  overflow: hidden !important;
+}
+
+.el-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(var(--el-dialog-width, 600px), calc(100vw - 48px)) !important;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 48px);
+  margin: 0 !important;
+  overflow: hidden;
+}
+
 .el-dialog__header,
 .el-message-box__header {
   border-bottom: 1px solid var(--border-subtle) !important;
   padding: 18px 24px !important;
+  flex-shrink: 0;
 }
 
 .el-dialog__title,
@@ -393,14 +424,17 @@ img {
   color: var(--text-secondary) !important;
 }
 
+.el-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 24px !important;
+}
+
 .el-dialog__footer {
   border-top: 1px solid var(--border-subtle) !important;
   padding: 16px 24px !important;
-}
-
-.el-overlay {
-  background-color: rgba(15, 23, 42, 0.36) !important;
-  backdrop-filter: blur(3px);
+  flex-shrink: 0;
 }
 
 .el-menu {

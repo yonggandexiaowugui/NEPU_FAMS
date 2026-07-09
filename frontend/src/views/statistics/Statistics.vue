@@ -126,7 +126,7 @@ async function loadOverview() {
 async function loadStatusStats() {
   const res = await getStatusStats()
   if (!Array.isArray(res) || !statusChart) return
-  const colorMap = { IDLE: '#b7791f', IN_USE: '#15803d', REPAIRING: '#a16207', SCRAPPED: '#be123c', LOSS: '#64748b' }
+  const colorMap = { IDLE: '#f59e0b', IN_USE: '#16a34a', REPAIRING: '#2563eb', SCRAPPED: '#e11d48', LOSS: '#64748b' }
   const data = res.map(item => ({ value: item.count || 0, name: item.statusName || item.status, itemStyle: { color: colorMap[item.status] || '#3157d5' } }))
   statusChart.setOption({ series: [{ data }] })
 }

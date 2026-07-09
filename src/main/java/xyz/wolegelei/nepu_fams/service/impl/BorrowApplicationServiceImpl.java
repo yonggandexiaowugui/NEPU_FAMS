@@ -28,6 +28,7 @@ import xyz.wolegelei.nepu_fams.vo.borrow.BorrowApplicationDetailVO;
 import xyz.wolegelei.nepu_fams.vo.borrow.BorrowApplicationVO;
 import xyz.wolegelei.nepu_fams.vo.borrow.BorrowApprovalVO;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,6 +84,7 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
             throw new BusinessException("该资产已有未完成的领用申请");
         }
 
+        LocalDateTime now = LocalDateTime.now();
         BorrowApplication application = new BorrowApplication();
         application.setAssetId(dto.getAssetId());
         application.setUserId(currentUserId);
@@ -90,6 +92,8 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         application.setPurpose(dto.getPurpose());
         application.setExpectedReturnDate(dto.getExpectedReturnDate());
         application.setStatus(BorrowStatus.PENDING_COLLEGE.getCode());
+        application.setCreateTime(now);
+        application.setUpdateTime(now);
         application.setIsDeleted(0);
 
         borrowApplicationMapper.insert(application);
@@ -224,6 +228,7 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         } else {
             application.setStatus(BorrowStatus.REJECTED.getCode());
         }
+        application.setUpdateTime(LocalDateTime.now());
         borrowApplicationMapper.updateById(application);
     }
 
@@ -267,6 +272,7 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         } else {
             application.setStatus(BorrowStatus.REJECTED.getCode());
         }
+        application.setUpdateTime(LocalDateTime.now());
         borrowApplicationMapper.updateById(application);
     }
 
@@ -326,6 +332,7 @@ public class BorrowApplicationServiceImpl implements BorrowApplicationService {
         }
 
         application.setStatus(BorrowStatus.RETURNING.getCode());
+        application.setUpdateTime(LocalDateTime.now());
         borrowApplicationMapper.updateById(application);
     }
 

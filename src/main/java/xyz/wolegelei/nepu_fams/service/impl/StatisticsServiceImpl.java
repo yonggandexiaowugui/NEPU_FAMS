@@ -246,13 +246,17 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public InventoryStatsVO getInventoryStats(Long taskId) {
         if (taskId == null) {
-            InventoryStatsVO vo = new InventoryStatsVO();
-            vo.setTotalCount(0);
-            vo.setCheckedCount(0);
-            vo.setProfitCount(0);
-            vo.setLossCount(0);
-            vo.setMatchCount(0);
-            return vo;
+            InventoryTask latestTask = getLatestPermittedInventoryTask();
+            if (latestTask == null) {
+                InventoryStatsVO vo = new InventoryStatsVO();
+                vo.setTotalCount(0);
+                vo.setCheckedCount(0);
+                vo.setProfitCount(0);
+                vo.setLossCount(0);
+                vo.setMatchCount(0);
+                return vo;
+            }
+            taskId = latestTask.getId();
         }
 
         InventoryTask task = inventoryTaskMapper.selectById(taskId);
@@ -363,6 +367,16 @@ public class StatisticsServiceImpl implements StatisticsService {
             return category.getId();
         }
         return category.getParentId();
+    }
+
+    private InventoryTask getLatestPermittedInventoryTask() {
+        SysUser currentUser = getCurrentUser();
+        LambdaQueryWrapper<InventoryTask> wrapper = new LambdaQueryWrapper<>();
+        if (RoleConstants.COLLEGE_ADMIN.equals(currentUser.getRole()) || RoleConstants.USER.equals(currentUser.getRole())) {
+            wrapper.eq(InventoryTask::getCollegeId, currentUser.getCollegeId());
+        }
+        wrapper.orderByDesc(InventoryTask::getCreateTime).orderByDesc(InventoryTask::getId).last("LIMIT 1");
+        return inventoryTaskMapper.selectOne(wrapper);
     }
 
     private void checkDataPermission(InventoryTask task, SysUser currentUser) {

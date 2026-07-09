@@ -59,7 +59,13 @@
       />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="领用详情" width="600px">
+    <el-dialog
+      v-model="detailVisible"
+      title="领用详情"
+      width="min(760px, calc(100vw - 32px))"
+      top="0"
+      append-to-body
+    >
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.assetName || '-' }}</el-descriptions-item>
@@ -103,7 +109,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="rejectVisible" title="拒绝申请" width="450px">
+    <el-dialog v-model="rejectVisible" title="拒绝申请" width="450px" append-to-body>
       <el-form :model="rejectForm" :rules="rejectRules" ref="rejectFormRef" label-width="80px">
         <el-form-item label="拒绝原因" prop="remark">
           <el-input v-model="rejectForm.remark" type="textarea" :rows="4" placeholder="请输入拒绝原因" />

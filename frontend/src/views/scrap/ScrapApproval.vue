@@ -42,7 +42,7 @@
       />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="报废详情" width="650px">
+    <el-dialog v-model="detailVisible" title="报废详情" width="650px" append-to-body>
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.assetName || '-' }}</el-descriptions-item>
@@ -68,7 +68,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="rejectVisible" title="驳回申请" width="450px">
+    <el-dialog v-model="rejectVisible" title="驳回申请" width="450px" append-to-body>
       <el-form :model="rejectForm" :rules="rejectRules" ref="rejectFormRef" label-width="80px">
         <el-form-item label="驳回原因" prop="remark">
           <el-input v-model="rejectForm.remark" type="textarea" :rows="4" placeholder="请输入驳回原因" />

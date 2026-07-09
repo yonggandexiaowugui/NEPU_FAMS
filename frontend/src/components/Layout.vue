@@ -1,6 +1,6 @@
 <template>
   <el-container class="layout-container">
-    <el-aside :width="sidebarWidth" class="layout-aside">
+    <el-aside class="layout-aside" :width="collapsed ? '64px' : '220px'">
       <Sidebar />
     </el-aside>
     <el-container>
@@ -16,31 +16,25 @@
         </router-view>
       </el-main>
     </el-container>
+    <AiAssistant />
   </el-container>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import Sidebar from './Sidebar.vue'
 import Header from './Header.vue'
+import Sidebar from './Sidebar.vue'
+import AiAssistant from './AiAssistant.vue'
 import { useAppStore } from '@/store'
 
 const appStore = useAppStore()
-const sidebarWidth = computed(() => appStore.sidebarWidth)
+const collapsed = computed(() => appStore.sidebarCollapsed)
 </script>
 
 <style lang="scss" scoped>
 .layout-container {
   height: 100vh;
   background: #f5f7fb;
-}
-
-.layout-aside {
-  background: #ffffff;
-  border-right: 1px solid #e6ebf3;
-  transition: width 0.25s ease;
-  overflow: hidden;
-  box-shadow: 1px 0 0 rgba(15, 23, 42, 0.02);
 }
 
 .layout-header {

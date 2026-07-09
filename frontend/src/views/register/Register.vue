@@ -28,6 +28,14 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="registerForm.email" placeholder="请输入邮箱" />
         </el-form-item>
+        <el-form-item label="验证码" prop="emailCode">
+          <div class="code-row">
+            <el-input v-model="registerForm.emailCode" placeholder="请输入邮箱验证码" maxlength="6" />
+            <el-button :disabled="codeCountdown > 0" :loading="codeLoading" @click="handleSendCode">
+              {{ codeCountdown > 0 ? `${codeCountdown}s后重发` : '发送验证码' }}
+            </el-button>
+          </div>
+        </el-form-item>
         <el-form-item label="电话" prop="phone">
           <el-input v-model="registerForm.phone" placeholder="请输入手机号" />
         </el-form-item>
@@ -56,15 +64,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { register } from '@/api/auth'
+import { register, sendEmailCode } from '@/api/auth'
 import { getAllColleges } from '@/api/college'
 
 const router = useRouter()
 const registerFormRef = ref(null)
 const loading = ref(false)
+const codeLoading = ref(false)
+const codeCountdown = ref(0)
+let codeTimer = null
 const collegeList = ref([])
 
 const registerForm = reactive({
@@ -73,6 +84,7 @@ const registerForm = reactive({
   password: '',
   confirmPassword: '',
   email: '',
+  emailCode: '',
   phone: '',
   collegeId: null,
   role: 'USER'
@@ -103,7 +115,12 @@ const registerRules = {
     { validator: validateConfirmPassword, trigger: 'blur' }
   ],
   email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+  ],
+  emailCode: [
+    { required: true, message: '请输入邮箱验证码', trigger: 'blur' },
+    { pattern: /^\d{6}$/, message: '验证码必须是6位数字', trigger: 'blur' }
   ],
   phone: [
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
@@ -119,6 +136,34 @@ async function loadColleges() {
     collegeList.value = res || []
   } catch (error) {
     console.error('Load colleges error:', error)
+  }
+}
+
+async function handleSendCode() {
+  if (!registerFormRef.value) return
+  try {
+    await registerFormRef.value.validateField('email')
+  } catch (error) {
+    return
+  }
+
+  codeLoading.value = true
+  try {
+    await sendEmailCode({ email: registerForm.email })
+    ElMessage.success('验证码已发送，请查看邮箱')
+    codeCountdown.value = 60
+    if (codeTimer) clearInterval(codeTimer)
+    codeTimer = setInterval(() => {
+      codeCountdown.value -= 1
+      if (codeCountdown.value <= 0) {
+        clearInterval(codeTimer)
+        codeTimer = null
+      }
+    }, 1000)
+  } catch (error) {
+    console.error('Send email code error:', error)
+  } finally {
+    codeLoading.value = false
   }
 }
 
@@ -142,6 +187,10 @@ async function handleRegister() {
 
 onMounted(() => {
   loadColleges()
+})
+
+onUnmounted(() => {
+  if (codeTimer) clearInterval(codeTimer)
 })
 </script>
 
@@ -189,6 +238,16 @@ onMounted(() => {
 .register-form {
   .register-btn {
     width: 100%;
+  }
+
+  .code-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+
+    .el-button {
+      flex-shrink: 0;
+    }
   }
 
   .login-link {

@@ -49,4 +49,12 @@ public class Asset {
     @TableLogic
     @TableField(fill = FieldFill.INSERT)
     private Integer isDeleted;
+
+    /**
+     * 3D 模型文件相对路径（例如 /uploads/3dmodel/xxx.glb）。
+     * 通过 raw SQL 直接 update，不要求 entity 必有该字段；
+     * 这里显式补上以支持 LambdaQuery 等查询。
+     */
+    @TableField(value = "model_url")
+    private String modelUrl;
 }

@@ -24,6 +24,7 @@ import xyz.wolegelei.nepu_fams.entity.College;
 import xyz.wolegelei.nepu_fams.entity.SysUser;
 import xyz.wolegelei.nepu_fams.mapper.CollegeMapper;
 import xyz.wolegelei.nepu_fams.mapper.SysUserMapper;
+import xyz.wolegelei.nepu_fams.service.EmailVerificationService;
 import xyz.wolegelei.nepu_fams.service.SysUserService;
 import xyz.wolegelei.nepu_fams.vo.LoginVO;
 import xyz.wolegelei.nepu_fams.vo.UserVO;
@@ -35,6 +36,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     private final SysUserMapper sysUserMapper;
     private final CollegeMapper collegeMapper;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -47,6 +49,7 @@ public class SysUserServiceImpl implements SysUserService {
         if (count > 0) {
             throw new BusinessException(ResultCode.USER_ALREADY_EXISTS);
         }
+        emailVerificationService.verifyRegisterCode(registerDTO.getEmail(), registerDTO.getEmailCode());
         SysUser user = new SysUser();
         BeanUtils.copyProperties(registerDTO, user);
         user.setPassword(BCrypt.hashpw(registerDTO.getPassword()));

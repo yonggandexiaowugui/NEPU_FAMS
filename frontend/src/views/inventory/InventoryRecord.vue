@@ -167,7 +167,7 @@
       />
     </el-card>
 
-    <el-dialog v-model="checkDialogVisible" title="资产盘点" width="450px">
+    <el-dialog v-model="checkDialogVisible" title="资产盘点" width="450px" append-to-body>
       <el-form :model="checkForm" label-width="100px">
         <el-form-item label="资产编号">
           <span>{{ checkForm.assetNo }}</span>
@@ -197,7 +197,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="diffDialogVisible" title="盘点差异与智能分析" width="960px">
+    <el-dialog v-model="diffDialogVisible" title="盘点差异与智能分析" width="960px" append-to-body>
       <el-alert
         v-if="analysisData"
         type="success"
@@ -298,6 +298,10 @@ async function loadTasks() {
   try {
     const res = await getInventoryTaskList({ pageNum: 1, pageSize: 100, status: 'IN_PROGRESS' })
     taskList.value = res.records || res.list || []
+    if (!queryForm.taskId && taskList.value.length > 0) {
+      queryForm.taskId = taskList.value[0].id
+      loadData()
+    }
   } catch (error) {
     console.error('Load task list error:', error)
   }

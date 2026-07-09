@@ -27,9 +27,12 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/auth/login",
                         "/api/auth/register",
+                        "/api/auth/email-code",
                         "/api/auth/logout",
                         "/error",
-                        "/favicon.ico"
+                        "/favicon.ico",
+                        "/spring/ai/loom/**",
+                        "/spring/ai/loom"
                 );
     }
 

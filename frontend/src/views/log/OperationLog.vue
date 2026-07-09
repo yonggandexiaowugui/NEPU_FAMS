@@ -69,7 +69,7 @@
       />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="日志详情" width="700px">
+    <el-dialog v-model="detailVisible" title="日志详情" width="700px" append-to-body>
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="操作类型">
           <el-tag :type="typeTagType(detailData.type)">{{ detailData.typeName || typeText(detailData.type) }}</el-tag>

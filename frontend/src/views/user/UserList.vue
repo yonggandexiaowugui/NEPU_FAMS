@@ -54,7 +54,7 @@
       />
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" append-to-body>
       <el-form :model="form" :rules="formRules" ref="formRef" label-width="80px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" :disabled="isEdit" />
@@ -95,7 +95,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="passwordDialogVisible" title="重置密码" width="460px">
+    <el-dialog v-model="passwordDialogVisible" title="重置密码" width="460px" append-to-body>
       <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="90px">
         <el-form-item label="用户">
           <el-input :model-value="passwordForm.username" disabled />

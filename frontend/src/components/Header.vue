@@ -1,10 +1,6 @@
 <template>
   <div class="header">
     <div class="header-left">
-      <el-icon class="toggle-btn" @click="toggleSidebar">
-        <Fold v-if="!collapsed" />
-        <Expand v-else />
-      </el-icon>
       <el-breadcrumb separator="/">
         <el-breadcrumb-item v-for="item in breadcrumbs" :key="item.path">
           {{ item.title }}
@@ -40,16 +36,14 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAppStore, useUserStore } from '@/store'
+import { useUserStore } from '@/store'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { Fold, Expand, ArrowDown, User, SwitchButton } from '@element-plus/icons-vue'
+import { ArrowDown, User, SwitchButton } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
-const appStore = useAppStore()
 const userStore = useUserStore()
 
-const collapsed = computed(() => appStore.sidebarCollapsed)
 const userName = computed(() => userStore.userInfo?.realName || userStore.userInfo?.username || '')
 
 const breadcrumbs = computed(() => {
@@ -59,10 +53,6 @@ const breadcrumbs = computed(() => {
     title: item.meta.title
   }))
 })
-
-function toggleSidebar() {
-  appStore.toggleSidebar()
-}
 
 function handleCommand(command) {
   if (command === 'profile') {
@@ -93,25 +83,6 @@ function handleCommand(command) {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 18px;
-}
-
-.toggle-btn {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  font-size: 18px;
-  cursor: pointer;
-  color: #64748b;
-  transition: all 0.2s ease;
-
-  &:hover {
-    color: #3157d5;
-    background: #f1f5ff;
-  }
 }
 
 .header-right {

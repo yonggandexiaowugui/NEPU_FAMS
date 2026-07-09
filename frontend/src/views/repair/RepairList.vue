@@ -60,7 +60,7 @@
       <Pagination :total="total" v-model:page-num="queryForm.pageNum" v-model:page-size="queryForm.pageSize" @change="handlePageChange" />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="维修详情" width="720px">
+    <el-dialog v-model="detailVisible" title="维修详情" width="720px" append-to-body>
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo || '-' }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.assetName || '-' }}</el-descriptions-item>
@@ -83,7 +83,7 @@
       <template #footer><el-button @click="detailVisible = false">关闭</el-button></template>
     </el-dialog>
 
-    <el-dialog v-model="assignVisible" title="派单" width="460px">
+    <el-dialog v-model="assignVisible" title="派单" width="460px" append-to-body>
       <el-form :model="assignForm" :rules="assignRules" ref="assignFormRef" label-width="90px">
         <el-form-item label="维修人员" prop="assigneeId">
           <el-select v-model="assignForm.assigneeId" placeholder="请选择维修人员" style="width: 100%" filterable>
@@ -105,7 +105,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="progressVisible" title="更新维修进度" width="460px">
+    <el-dialog v-model="progressVisible" title="更新维修进度" width="460px" append-to-body>
       <el-form :model="progressForm" :rules="progressRules" ref="progressFormRef" label-width="90px">
         <el-form-item label="处理结果" prop="repairResult">
           <el-input v-model="progressForm.repairResult" type="textarea" :rows="4" placeholder="请描述维修进度或处理结果" />

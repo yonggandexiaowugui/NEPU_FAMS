@@ -16,6 +16,14 @@ export function register(data) {
   })
 }
 
+export function sendEmailCode(data) {
+  return request({
+    url: '/auth/email-code',
+    method: 'post',
+    data
+  })
+}
+
 export function logout() {
   return request({
     url: '/auth/logout',

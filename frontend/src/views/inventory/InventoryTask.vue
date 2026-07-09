@@ -42,6 +42,7 @@
           <template #default="{ row }">
             <el-button v-if="row.status === 'PENDING'" type="primary" link @click="handleStart(row)">开始</el-button>
             <el-button v-if="row.status === 'IN_PROGRESS'" type="success" link @click="handleComplete(row)">完成</el-button>
+            <el-button v-if="row.status === 'COMPLETED'" type="warning" link @click="handleArchive(row)">归档</el-button>
             <el-button v-if="row.status === 'PENDING'" type="primary" link @click="handleEdit(row)">编辑</el-button>
             <el-button v-if="row.status === 'PENDING'" type="danger" link @click="handleDelete(row)">删除</el-button>
           </template>
@@ -56,7 +57,7 @@
       />
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" append-to-body>
       <el-form :model="form" :rules="formRules" ref="formRef" label-width="100px">
         <el-form-item label="任务名称" prop="name">
           <el-input v-model="form.name" />
@@ -90,7 +91,8 @@ import {
   updateInventoryTask,
   deleteInventoryTask,
   startInventoryTask,
-  completeInventoryTask
+  completeInventoryTask,
+  archiveInventoryTask
 } from '@/api/inventory'
 import { getAllColleges } from '@/api/college'
 
@@ -254,6 +256,22 @@ function handleComplete(row) {
       loadData()
     } catch (error) {
       console.error('Complete error:', error)
+    }
+  }).catch(() => {})
+}
+
+function handleArchive(row) {
+  ElMessageBox.confirm(`确定要归档盘点任务 "${row.name}" 吗？`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    try {
+      await archiveInventoryTask(row.id)
+      ElMessage.success('任务已归档')
+      loadData()
+    } catch (error) {
+      console.error('Archive error:', error)
     }
   }).catch(() => {})
 }

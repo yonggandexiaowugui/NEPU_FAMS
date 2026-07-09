@@ -52,6 +52,13 @@ export function completeInventoryTask(id) {
   })
 }
 
+export function archiveInventoryTask(id) {
+  return request({
+    url: `/inventory/task/archive/${id}`,
+    method: 'post'
+  })
+}
+
 export function getInventoryRecordList(params) {
   return request({
     url: '/inventory/record/page',

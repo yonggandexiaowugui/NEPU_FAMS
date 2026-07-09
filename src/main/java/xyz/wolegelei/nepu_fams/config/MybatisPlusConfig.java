@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 import java.time.LocalDateTime;
 
 @Configuration
-@MapperScan("xyz.wolegelei.nepu_fams.mapper")
+@MapperScan({"xyz.wolegelei.nepu_fams.mapper", "xyz.wolegelei.nepu_fams.asset.three.mapper"})
 public class MybatisPlusConfig {
 
     @Bean

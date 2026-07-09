@@ -104,6 +104,13 @@ const routes = [
         meta: { title: '统计报表', icon: 'PieChart', roles: ['SUPER_ADMIN', 'COLLEGE_ADMIN'] }
       },
       {
+        path: 'ai/analysis',
+        name: 'AiAnalysis',
+        component: () => import('@/views/ai/AiAnalysis.vue'),
+        meta: { title: '智能分析', icon: 'DataAnalysis', roles: ['SUPER_ADMIN', 'COLLEGE_ADMIN'] }
+      },
+
+      {
         path: 'log/operation',
         name: 'OperationLog',
         component: () => import('@/views/log/OperationLog.vue'),

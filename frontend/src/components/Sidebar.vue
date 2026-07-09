@@ -16,7 +16,7 @@
       background-color="#ffffff"
       text-color="#64748b"
       active-text-color="#3157d5"
-      router
+      @select="handleMenuSelect"
     >
       <template v-for="item in menuList" :key="item.path">
         <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.path">
@@ -57,11 +57,14 @@ import {
   Files,
   EditPen,
   PieChart,
+  DataAnalysis,
+  Monitor,
   Tickets,
   UserFilled
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
+const router = useRouter()
 const appStore = useAppStore()
 const userStore = useUserStore()
 
@@ -83,6 +86,8 @@ const iconMap = {
   Files,
   EditPen,
   PieChart,
+  DataAnalysis,
+  Monitor,
   Tickets,
   UserFilled
 }
@@ -102,6 +107,8 @@ const allMenus = [
   { path: '/inventory/task', title: '盘点任务', icon: 'Files', roles: ['SUPER_ADMIN', 'COLLEGE_ADMIN'] },
   { path: '/inventory/record', title: '盘点录入', icon: 'EditPen', roles: ['SUPER_ADMIN', 'COLLEGE_ADMIN'] },
   { path: '/statistics', title: '统计报表', icon: 'PieChart', roles: ['SUPER_ADMIN', 'COLLEGE_ADMIN'] },
+  { path: '/ai/analysis', title: '智能分析', icon: 'DataAnalysis', roles: ['SUPER_ADMIN', 'COLLEGE_ADMIN'] },
+  { path: '/spring/ai/loom/index.html', title: 'AI 工作台', icon: 'Monitor', roles: ['SUPER_ADMIN'], external: true },
   { path: '/log/operation', title: '操作日志', icon: 'Tickets', roles: ['SUPER_ADMIN', 'COLLEGE_ADMIN'] },
   { path: '/profile', title: '个人中心', icon: 'UserFilled' }
 ]
@@ -113,6 +120,15 @@ const menuList = computed(() => {
     return item.roles.includes(userRole)
   })
 })
+
+function handleMenuSelect(path) {
+  const item = menuList.value.find(menu => menu.path === path)
+  if (item?.external) {
+    window.open(path, '_blank')
+    return
+  }
+  router.push(path)
+}
 </script>
 
 <style lang="scss" scoped>

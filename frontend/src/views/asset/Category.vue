@@ -21,7 +21,7 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" append-to-body>
       <el-form :model="form" :rules="formRules" ref="formRef" label-width="100px">
         <el-form-item label="上级分类" v-if="form.parentId">
           <span>{{ parentName }}</span>

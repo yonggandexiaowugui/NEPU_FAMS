@@ -30,6 +30,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/scrap/**").setViewName("forward:/index.html");
         registry.addViewController("/inventory/**").setViewName("forward:/index.html");
         registry.addViewController("/statistics/**").setViewName("forward:/index.html");
+        registry.addViewController("/3d/**").setViewName("forward:/index.html");
         registry.addViewController("/log/**").setViewName("forward:/index.html");
         registry.addViewController("/profile/**").setViewName("forward:/index.html");
     }

@@ -12,6 +12,17 @@
       </div>
     </div>
 
+    <section class="ai-insight-card">
+      <div class="ai-insight-main">
+        <p class="ai-kicker">AI 智能洞察</p>
+        <div v-if="aiInsightLoading" class="ai-loading">Agent 正在分析当前资产数据...</div>
+        <div v-else class="ai-insight-text" v-html="formatMessage(aiInsight || defaultInsight)"></div>
+      </div>
+      <el-button type="primary" plain :loading="aiInsightLoading" @click="generateAiInsight">
+        生成 AI 洞察
+      </el-button>
+    </section>
+
     <el-row :gutter="24" class="stats-row">
       <el-col :span="8" v-for="stat in stats" :key="stat.title">
         <el-card class="stat-card" shadow="hover">
@@ -62,21 +73,32 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <section class="showcase-section">
+      <Asset3DShowcase />
+    </section>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as echarts from 'echarts'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store'
 import { getOverviewStats, getStatusStats, getCategoryStats, getCollegeStats } from '@/api/statistics'
 import { Box, Money, CircleCheck, Warning, Tools, Delete } from '@element-plus/icons-vue'
+import Asset3DShowcase from '@/components/3d/Asset3DShowcase.vue'
 
 const userStore = useUserStore()
 const loading = ref(false)
 const statusChartRef = ref(null)
 const categoryChartRef = ref(null)
 const collegeChartRef = ref(null)
+const aiInsight = ref('')
+const aiInsightLoading = ref(false)
+
+const defaultInsight = '点击“生成 AI 洞察”，Agent 将结合资产总览、状态分布、学院分布和分类数据，自动输出当前资产管理建议。'
 
 const userName = computed(() => userStore.userInfo?.realName || userStore.userInfo?.username || '用户')
 
@@ -181,10 +203,10 @@ async function loadStatusChart() {
     const res = await getStatusStats()
     if (Array.isArray(res) && statusChart) {
       const colorMap = {
-        IDLE: '#b7791f',
-        IN_USE: '#15803d',
-        REPAIRING: '#a16207',
-        SCRAPPED: '#be123c',
+        IDLE: '#f59e0b',
+        IN_USE: '#16a34a',
+        REPAIRING: '#2563eb',
+        SCRAPPED: '#e11d48',
         LOSS: '#64748b'
       }
       const data = res.map(item => ({
@@ -230,6 +252,40 @@ async function loadCollegeChart() {
   } catch (error) {
     console.error('Load college chart error:', error)
   }
+}
+
+async function generateAiInsight() {
+  if (aiInsightLoading.value) return
+  aiInsightLoading.value = true
+  try {
+    const response = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userStore.token || ''
+      },
+      body: JSON.stringify({
+        message: '请基于当前 NEPU-FAMS 固定资产系统真实数据，生成首页 AI 智能洞察。要求包含资产总览、闲置风险、维修风险、学院/分类分布特点和 3 条管理建议，回答简洁。'
+      })
+    })
+    const data = await response.json()
+    if (!response.ok || data.code !== 200) {
+      throw new Error(data.msg || `请求失败: ${response.status}`)
+    }
+    aiInsight.value = data.data || defaultInsight
+  } catch (error) {
+    ElMessage.error(error.message || 'AI 洞察生成失败')
+  } finally {
+    aiInsightLoading.value = false
+  }
+}
+
+function formatMessage(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>')
 }
 
 function handleResize() {
@@ -322,6 +378,38 @@ onUnmounted(() => {
   font-size: 16px;
 }
 
+.ai-insight-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 22px 24px;
+  border: 1px solid #dfe6f1;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 92% 18%, rgba(49, 87, 213, 0.16), transparent 26%),
+    linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+  box-shadow: 0 14px 34px rgba(30, 41, 59, 0.07);
+}
+
+.ai-insight-main {
+  min-width: 0;
+}
+
+.ai-kicker {
+  margin: 0 0 8px;
+  color: #3157d5;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ai-insight-text,
+.ai-loading {
+  color: #334155;
+  line-height: 1.8;
+}
+
 .stats-row {
   margin-bottom: 34px;
   row-gap: 24px;
@@ -401,4 +489,9 @@ onUnmounted(() => {
     width: 100%;
   }
 }
+
+.showcase-section {
+  margin-top: 8px;
+}
+
 </style>

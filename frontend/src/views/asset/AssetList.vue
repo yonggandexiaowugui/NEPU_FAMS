@@ -91,7 +91,7 @@
       />
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="650px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="650px" append-to-body>
       <el-form :model="form" :rules="formRules" ref="formRef" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -171,7 +171,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="detailVisible" title="资产详情" width="600px">
+    <el-dialog v-model="detailVisible" title="资产详情" width="600px" append-to-body>
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="资产编号">{{ detailData.assetNo }}</el-descriptions-item>
         <el-descriptions-item label="资产名称">{{ detailData.name }}</el-descriptions-item>
@@ -184,11 +184,28 @@
         <el-descriptions-item label="存放位置">{{ detailData.location || '-' }}</el-descriptions-item>
         <el-descriptions-item label="购置日期">{{ detailData.purchaseDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ detailData.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="3D模型" :span="2">
+          <div class="model-actions">
+            <el-upload
+              :show-file-list="false"
+              accept=".glb"
+              :http-request="handleModelUpload"
+            >
+              <el-button type="primary" size="small" :loading="modelUploading">上传/绑定GLB</el-button>
+            </el-upload>
+            <el-button size="small" :disabled="!modelUrl" @click="modelPreviewVisible = true">预览3D模型</el-button>
+            <span class="model-tip">{{ modelUrl ? '已绑定模型' : '暂未绑定模型' }}</span>
+          </div>
+        </el-descriptions-item>
         <el-descriptions-item label="备注" :span="2">{{ detailData.remark || '-' }}</el-descriptions-item>
       </el-descriptions>
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
       </template>
+    </el-dialog>
+
+    <el-dialog v-model="modelPreviewVisible" title="资产3D预览" width="820px" append-to-body destroy-on-close>
+      <AssetModelPreview :model-url="modelUrl" :visible="modelPreviewVisible" />
     </el-dialog>
   </div>
 </template>
@@ -197,9 +214,11 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Pagination from '@/components/Pagination.vue'
+import AssetModelPreview from '@/components/3d/AssetModelPreview.vue'
 import { getAssetList, addAsset, updateAsset, deleteAsset, exportAsset, getAsset } from '@/api/asset'
 import { getCategoryTree } from '@/api/category'
 import { getAllColleges } from '@/api/college'
+import { uploadThreeModel, bindAssetModel, getAssetModel } from '@/api/assetThree'
 import { formatMoney } from '@/utils/format'
 
 const loading = ref(false)
@@ -215,6 +234,9 @@ const total = ref(0)
 const categoryTree = ref([])
 const collegeList = ref([])
 const detailData = ref(null)
+const modelUrl = ref('')
+const modelUploading = ref(false)
+const modelPreviewVisible = ref(false)
 
 const queryForm = reactive({
   pageNum: 1,
@@ -339,8 +361,37 @@ async function handleView(row) {
     const res = await getAsset(row.id)
     detailData.value = res
     detailVisible.value = true
+    modelPreviewVisible.value = false
+    await loadAssetModel(row.id)
   } catch (error) {
     console.error('Get asset detail error:', error)
+  }
+}
+
+async function loadAssetModel(assetId) {
+  modelUrl.value = ''
+  try {
+    const res = await getAssetModel(assetId)
+    modelUrl.value = res.modelUrl || ''
+  } catch (error) {
+    console.error('Load asset model error:', error)
+  }
+}
+
+async function handleModelUpload(option) {
+  if (!detailData.value?.id) return
+  modelUploading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', option.file)
+    const uploadRes = await uploadThreeModel(formData)
+    await bindAssetModel({ assetId: detailData.value.id, modelUrl: uploadRes.url })
+    modelUrl.value = uploadRes.url
+    ElMessage.success('3D模型绑定成功')
+  } catch (error) {
+    console.error('Upload 3D model error:', error)
+  } finally {
+    modelUploading.value = false
   }
 }
 
@@ -426,6 +477,18 @@ onMounted(() => {
 
   .query-form {
     margin-bottom: 20px;
+  }
+
+  .model-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .model-tip {
+    color: #909399;
+    font-size: 13px;
   }
 }
 </style>
